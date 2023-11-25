@@ -14,9 +14,16 @@
     in
     {
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = [
+        buildInputs = with pkgs; [
+          (python3.withPackages (py-pkgs: with py-pkgs; [ setuptools ]))
+
           (flakey-devShell-pkgs.default.override { environments = [ "nix" "python" ]; })
-          (flakey-devShell-pkgs.vscodium.override { environments = [ "nix" "python" ]; })
+          (flakey-devShell-pkgs.vscodium.override {
+            environments = [ "nix" "python" ];
+            extensions = with vscode-extensions; [
+              tamasfe.even-better-toml
+            ];
+          })
         ];
       };
     };
