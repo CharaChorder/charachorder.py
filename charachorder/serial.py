@@ -17,7 +17,7 @@ class CCSerial:
     def __exit__(self, exc_type, exc_value, traceback):
         self.connection.close()
 
-    def execute(self, *args) -> List[str]:
+    def execute(self, *args: str) -> List[str]:
         command = " ".join(args)
         self.connection.write(f"{command}\r\n".encode("utf-8"))
         output = self.connection.readline().decode("utf-8").strip().split(" ")
