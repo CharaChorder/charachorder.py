@@ -1,8 +1,11 @@
 from .device import CCDevice
+from .serial import CCSerial
 
 
 def main():
-    print(CCDevice.list_devices())
+    for device in CCDevice.list_devices():
+        with CCSerial(device) as cc_serial:
+            print(cc_serial.execute("ID"))
 
 
 if __name__ == "__main__":
