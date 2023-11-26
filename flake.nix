@@ -17,7 +17,7 @@
         buildInputs = with pkgs; [
           (python38.withPackages (py-pkgs: with py-pkgs; [ setuptools ]))
 
-          (flakey-devShell-pkgs.default.override { environments = [ "nix" "python" ]; })
+          (flakey-devShell-pkgs.default.override { environments = [ "nix" ]; })
           (flakey-devShell-pkgs.vscodium.override {
             environments = [ "nix" "python" ];
             extensions = with vscode-extensions; [
