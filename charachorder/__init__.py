@@ -14,3 +14,6 @@ __author__ = "GetPsyched"
 __license__ = "MIT"
 __copyright__ = "Copyright 2023-present GetPsyched"
 __version__ = "0.1.0"
+
+from .device import *
+from .errors import *

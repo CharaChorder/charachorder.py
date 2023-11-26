@@ -15,7 +15,10 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = with pkgs; [
-          (python38.withPackages (py-pkgs: with py-pkgs; [ setuptools ]))
+          (python38.withPackages (py-pkgs: with py-pkgs; [
+            pyserial
+            setuptools
+          ]))
 
           (flakey-devShell-pkgs.default.override { environments = [ "nix" ]; })
           (flakey-devShell-pkgs.vscodium.override {

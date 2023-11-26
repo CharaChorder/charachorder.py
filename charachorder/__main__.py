@@ -1,5 +1,8 @@
+from .device import CCDevice
+
+
 def main():
-    print("Hello, world")
+    print(CCDevice.list_devices())
 
 
 if __name__ == "__main__":
