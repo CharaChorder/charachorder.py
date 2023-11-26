@@ -35,7 +35,7 @@ class UnknownCommand(SerialException):
 class InvalidResponse(SerialException):
     """An exception raised when the response of a command was invalid"""
 
-    def __init__(self, command: str, response: List[str]):
+    def __init__(self, command: str, response: str):
         super().__init__(
             f'The command "{command}" produced an invalid response: "{response}"'
         )

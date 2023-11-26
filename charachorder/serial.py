@@ -28,6 +28,6 @@ class CCSerial:
         if command[0] == "UKN":
             raise UnknownCommand(" ".join(args))
         if command != args:
-            raise InvalidResponse(" ".join(args), output)
+            raise InvalidResponse(" ".join(args), " ".join(output))
 
         return actual_output
