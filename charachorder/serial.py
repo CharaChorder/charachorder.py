@@ -3,7 +3,7 @@ from typing import Optional, Tuple, Union
 from serial import Serial
 
 from .device import CCDevice
-from .errors import InvalidResponse, UnknownCommand
+from .errors import UnknownCommand
 
 
 class Hexadecimal(str):
@@ -35,8 +35,6 @@ class CCSerial:
 
         if command_from_output[0] == "UKN":
             raise UnknownCommand(command)
-        if command_from_output != args:
-            raise InvalidResponse(command, " ".join(output))
 
         return actual_output
 
@@ -58,9 +56,6 @@ class CCSerial:
             raise IndexError("Chordmap index out of range")
 
         chord, chordmap, success = self.execute("CML", "C1", index)
-        if chord == "0" or chordmap == "0":
-            raise InvalidResponse("CML C1", " ".join((chord, chordmap)))
-
         return Hexadecimal(chord), Hexadecimal(chordmap)
 
     def get_chordmap_by_chord(self, chord: Hexadecimal) -> Optional[str]:
