@@ -22,7 +22,6 @@ setup(
     author="GetPsyched",
     author_email="dev@getpsyched.dev",
     project_urls={
-        "Source": PROJECT_URL,
         "Issue tracker": f"{PROJECT_URL}/issues",
     },
     packages=["charachorder"],
