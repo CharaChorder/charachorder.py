@@ -11,7 +11,7 @@ class CCSerial:
         self.device = device
 
     def __enter__(self):
-        self.connection = Serial(self.device.serial_port, 115200, timeout=1)
+        self.connection = Serial(self.device.port, 115200, timeout=1)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
