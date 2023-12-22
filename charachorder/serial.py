@@ -176,3 +176,11 @@ class CCSerial:
 
     def append_functional_chords(self):
         self.execute("RST", "FUNC")
+
+    # RAM
+    def get_available_ram(self) -> int:
+        return int(self.execute("RAM")[0])
+
+    # SIM
+    def sim(self, subcommand: str, value: Hexadecimal) -> Hexadecimal:
+        return Hexadecimal(self.execute("SIM", subcommand, value)[0])
