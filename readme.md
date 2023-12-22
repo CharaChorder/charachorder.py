@@ -2,6 +2,9 @@
 
 A wrapper for CharaChorder's Serial API written in Python
 
+> **Warning**
+> This project is in beta; breaking changes will occur without notice. Please wait for v1.0.0
+
 ## Usage
 
 ```py
