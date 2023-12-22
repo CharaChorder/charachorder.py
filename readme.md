@@ -9,5 +9,5 @@ from charachorder import CCDevice, CCSerial
 
 for device in CCDevice.list_devices():
     with CCSerial(device) as cc_serial:
-        print(cc_serial.execute("ID"))
+        print(cc_serial.get_device_id())
 ```
