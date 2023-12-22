@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from serial import Serial
 
@@ -25,8 +25,8 @@ class CCSerial:
     def __exit__(self, exc_type, exc_value, traceback):
         self.connection.close()
 
-    def execute(self, *args: str) -> Tuple[str, ...]:
-        command = " ".join(args)
+    def execute(self, *args: Union[int, str]) -> Tuple[str, ...]:
+        command = " ".join(map(str, args))
         self.connection.write(f"{command}\r\n".encode("utf-8"))
         output = tuple(self.connection.readline().decode("utf-8").strip().split(" "))
 
@@ -57,7 +57,7 @@ class CCSerial:
         if index not in range(self.get_chordmap_count()):
             raise IndexError("Chordmap index out of range")
 
-        chord, chordmap, success = self.execute("CML", "C1", str(index))
+        chord, chordmap, success = self.execute("CML", "C1", index)
         if chord == "0" or chordmap == "0":
             raise InvalidResponse("CML C1", " ".join((chord, chordmap)))
 
