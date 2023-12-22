@@ -92,7 +92,7 @@ class CCSerial:
         return " ".join(self.execute("ID"))
 
     # VERSION
-    def get_device_version(self) -> str:
+    def get_ccos_version(self) -> str:
         return self.execute("VERSION")[0]
 
     # CML
