@@ -147,3 +147,32 @@ class CCSerial:
             raise IndexError("Action id out of range. Must be between 8-2047")
 
         return self.execute("VAR", "B4", code.value, index, action_id)[0] == "0"
+
+    # RST
+
+    def restart_device(self):
+        self.execute("RST")
+
+    def factory_reset(self):
+        self.execute("RST", "FACTORY")
+
+    def enter_bootloader_mode(self):
+        self.execute("RST", "BOOTLOADER")
+
+    def reset_parameters(self):
+        self.execute("RST", "PARAMS")
+
+    def reset_keymaps(self):
+        self.execute("RST", "KEYMAPS")
+
+    def append_starter_chords(self):
+        self.execute("RST", "STARTER")
+
+    def nuke_chordmaps(self):
+        self.execute("RST", "CLEARCML")
+
+    def upgrade_chordmaps(self):
+        self.execute("RST", "UPGRADECML")
+
+    def append_functional_chords(self):
+        self.execute("RST", "FUNC")
