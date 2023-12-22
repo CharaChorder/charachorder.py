@@ -31,3 +31,11 @@ class CCSerial:
             raise InvalidResponse(command, " ".join(output))
 
         return actual_output
+
+    # ID
+    def get_device_id(self) -> str:
+        return " ".join(self.execute("ID"))
+
+    # VERSION
+    def get_device_version(self) -> str:
+        return self.execute("VERSION")[0]
