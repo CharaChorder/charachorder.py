@@ -20,10 +20,10 @@ class CCSerial:
     def execute(self, *args: str) -> Tuple[str, ...]:
         command = " ".join(args)
         self.connection.write(f"{command}\r\n".encode("utf-8"))
-        output = self.connection.readline().decode("utf-8").strip().split(" ")
+        output = tuple(self.connection.readline().decode("utf-8").strip().split(" "))
 
-        command_from_output = tuple(output[: len(args)])
-        actual_output = tuple(output[len(args) :])
+        command_from_output = output[: len(args)]
+        actual_output = output[len(args) :]
 
         if command_from_output[0] == "UKN":
             raise UnknownCommand(command)
