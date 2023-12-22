@@ -107,9 +107,9 @@ class CCSerial:
         chord, chordmap, success = self.execute("CML", "C1", index)
         return Hexadecimal(chord), Hexadecimal(chordmap)
 
-    def get_chordmap_by_chord(self, chord: Hexadecimal) -> Optional[str]:
+    def get_chordmap_by_chord(self, chord: Hexadecimal) -> Optional[Hexadecimal]:
         chordmap = self.execute("CML", "C2", chord)[0]
-        return chordmap if chordmap != "0" else None
+        return Hexadecimal(chordmap) if chordmap != "0" else None
 
     def set_chordmap_by_chord(self, chord: Hexadecimal, chordmap: Hexadecimal) -> bool:
         return self.execute("CML", "C3", chord, chordmap)[0] == "0"
