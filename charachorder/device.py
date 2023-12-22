@@ -35,5 +35,5 @@ class CCDevice:
         return f"{self.name} ({self.serial_port})"
 
     @staticmethod
-    def list_devices() -> list["CCDevice"]:
+    def list_devices() -> list[CCDevice]:
         return [CCDevice(device) for device in list_ports.comports()]
