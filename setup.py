@@ -1,5 +1,7 @@
-from setuptools import setup
 import re
+from pathlib import Path
+
+from setuptools import setup
 
 with open("charachorder/__init__.py") as f:
     match = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE)
@@ -7,28 +9,23 @@ with open("charachorder/__init__.py") as f:
         raise RuntimeError("version is not set")
     version = match.group(1)
 
-readme = ""
-with open("readme.md") as f:
-    readme = f.read()
-
-packages = ["charachorder"]
-
 setup(
     name="charachorder",
-    author="GetPsyched",
+    version=version,
+    license="MIT",
+    description="A wrapper for CharaChorder's Serial API written in Python",
+    long_description=Path("readme.md").read_text(),
+    long_description_content_type="text/markdown",
     url="https://github.com/GetPsyched/charachorder.py",
+    author="GetPsyched",
+    author_email="dev@getpsyched.dev",
     project_urls={
         "Issue tracker": "https://github.com/GetPsyched/charachorder.py/issues",
     },
-    version=version,
-    packages=packages,
-    license="MIT",
-    description="A wrapper for CharaChorder's Serial API written in Python",
-    long_description=readme,
-    long_description_content_type="text/markdown",
+    packages=["charachorder"],
     include_package_data=True,
-    install_requires=["pyserial"],
     python_requires=">=3.8.0",
+    install_requires=["pyserial"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",
@@ -38,7 +35,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "Topic :: Internet",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
