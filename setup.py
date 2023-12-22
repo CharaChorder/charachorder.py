@@ -9,6 +9,8 @@ with open("charachorder/__init__.py") as f:
         raise RuntimeError("version is not set")
     version = match.group(1)
 
+PROJECT_URL = "https://github.com/GetPsyched/charachorder.py"
+
 setup(
     name="charachorder",
     version=version,
@@ -16,11 +18,12 @@ setup(
     description="A wrapper for CharaChorder's Serial API written in Python",
     long_description=Path("readme.md").read_text(),
     long_description_content_type="text/markdown",
-    url="https://github.com/GetPsyched/charachorder.py",
+    url=PROJECT_URL,
     author="GetPsyched",
     author_email="dev@getpsyched.dev",
     project_urls={
-        "Issue tracker": "https://github.com/GetPsyched/charachorder.py/issues",
+        "Source": PROJECT_URL,
+        "Issue tracker": f"{PROJECT_URL}/issues",
     },
     packages=["charachorder"],
     include_package_data=True,
