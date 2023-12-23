@@ -71,7 +71,8 @@ class CharaChorder(Device):
         devices = []
         for device in super().list_devices():
             subclass = pid_mapping.get(device.product_id, cls)
-            devices.append(subclass(device))
+            if issubclass(subclass, cls):
+                devices.append(subclass(device))
         return devices
 
 
