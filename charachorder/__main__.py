@@ -1,11 +1,10 @@
-from .device import CCDevice
-from .serial import CCSerial
+from .device import CharaChorder
 
 
 def main():
-    for device in CCDevice.list_devices():
-        with CCSerial(device) as cc_serial:
-            print(cc_serial.execute("ID"))
+    for device in CharaChorder.list_devices():
+        with device:
+            print(device.execute("ID"))
 
 
 if __name__ == "__main__":

@@ -33,11 +33,11 @@ python3 -m pip install -U .
 ## Usage
 
 ```py
-from charachorder import CCDevice, CCSerial
+from charachorder import CharaChorder
 
-for device in CCDevice.list_devices():
-    with CCSerial(device) as cc_serial:
-        print(cc_serial.get_device_id())
+for device in CharaChorder.list_devices():
+    with device:
+        print(device.execute("ID"))
 ```
 
 ## Links

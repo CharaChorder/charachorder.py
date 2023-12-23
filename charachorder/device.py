@@ -1,57 +1,64 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal, NamedTuple
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 from serial.tools import list_ports
-from serial.tools.list_ports_common import ListPortInfo
 
 from .errors import UnknownProduct, UnknownVendor
 
 
-@dataclass
-class CCDevice:
-    name: str
-    company: Literal["CharaChorder"]
-    product: Literal["One", "Lite", "X", "Engine"]
-    bootloader_mode: bool
-    vendor: Literal["Adafruit", "Espressif"]
-    chipset: Literal["M0", "S2"]
+pid_mapping = {}
+vid_mapping = {
+    0x239A: ("Adafruit", "M0"),
+    0x303A: ("Espressif", "S2"),
+}
+
+
+def allowed_product_ids(*product_ids: int):
+    def decorator(cls):
+        for product_id in product_ids:
+            pid_mapping[product_id] = cls
+        return cls
+
+    return decorator
+
+
+class Device(NamedTuple):
+    product_id: int
+    vendor_id: int
     port: str
 
-    def __init__(self, device: ListPortInfo):
-        self.company = "CharaChorder"
+    @classmethod
+    def list_devices(cls) -> list[Self]:
+        devices = []
+        for port_info in list_ports.comports():
+            device = cls(
+                product_id=port_info.pid,
+                vendor_id=port_info.vid,
+                port=port_info.device,
+            )
+            devices.append(device)
+        return devices
 
-        known_pids = {
-            0x800F: "One",  # M0
-            0x801C: "Lite",  # M0
-            0x812E: "Lite",  # S2
-            0x812F: "Lite",  # S2 - UF2 Bootloader
-            0x818B: "X",  # S2
-            0x818C: "X",  # S2 - UF2 Bootloader
-            0x818D: "X",  # S2 Host
-            0x818E: "X",  # S2 Host - UF2 Bootloader
-            0x8189: "Engine",  # S2
-            0x818A: "Engine",  # S2 - UF2 Bootloader
-        }
-        if device.pid in known_pids:
-            self.name = known_pids[device.pid]
-            if device.pid in (0x812F, 0x818C, 0x818E, 0x818A):
-                self.bootloader_mode = True
+
+class CharaChorder(Device):
+    bootloader_mode: bool
+    chipset: Literal["M0", "S2"]
+    vendor: Literal["Adafruit", "Espressif"]
+
+    def __init__(self, device: Device):
+        if device.product_id not in pid_mapping:
+            raise UnknownProduct(device.product_id)
+
+        if device.vendor_id in vid_mapping:
+            self.name, self.chipset = vid_mapping[device.vendor_id]
         else:
-            raise UnknownProduct(device.pid)
+            raise UnknownVendor(device.vendor_id)
 
-        known_vids = {
-            0x239A: ("Adafruit", "M0"),
-            0x303A: ("Espressif", "S2"),
-        }
-        if device.vid in known_vids:
-            self.name, self.chipset = known_vids[device.vid]
-        else:
-            raise UnknownVendor(device.vid)
-
-        self.port = device.device
-        self.name = f"{self.company} {self.product} {self.chipset}"
+        self.name = f"{self.__class__.__name__} {self.chipset}"
 
     def __repr__(self):
         return f"{self.name} ({self.port})"
@@ -60,5 +67,47 @@ class CCDevice:
         return f"{self.name} ({self.port})"
 
     @classmethod
-    def list_devices(cls) -> list[CCDevice]:
-        return [cls(device) for device in list_ports.comports()]
+    def list_devices(cls) -> list[Self]:
+        devices = []
+        for device in super().list_devices():
+            subclass = pid_mapping.get(device.product_id, cls)
+            devices.append(subclass(device))
+        return devices
+
+
+@allowed_product_ids(0x800F)  # M0
+class CharaChorderOne(CharaChorder):
+    pass
+
+
+@allowed_product_ids(
+    0x801C,  # M0
+    0x812E,  # S2
+    0x812F,  # S2 - UF2 Bootloader
+)
+class CharaChorderLite(CharaChorder):
+    def __init__(self, device: CharaChorder):
+        super().__init__(device)
+        self.bootloader_mode = self.product_id == 0x812F
+
+
+@allowed_product_ids(
+    0x818B,  # S2
+    0x818C,  # S2 - UF2 Bootloader
+    0x818D,  # S2 Host
+    0x818E,  # S2 Host - UF2 Bootloader
+)
+class CharaChorderX(CharaChorder):
+    def __init__(self, device: CharaChorder):
+        super().__init__(device)
+        self.bootloader_mode = self.product_id in (0x818C, 0x818E)
+
+
+@allowed_product_ids(
+    0x8189,  # S2
+    0x818A,  # S2 - UF2 Bootloader
+)
+class CharaChorderEngine(CharaChorder):
+    def __init__(self, device: CharaChorder):
+        super().__init__(device)
+        self.bootloader_mode = self.product_id == 0x818A

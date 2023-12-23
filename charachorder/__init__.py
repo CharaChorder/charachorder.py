@@ -17,4 +17,3 @@ __version__ = "0.1.1"
 
 from .device import *
 from .errors import *
-from .serial import *
