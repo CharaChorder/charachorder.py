@@ -59,6 +59,6 @@ class CCDevice:
     def __str__(self):
         return f"{self.name} ({self.port})"
 
-    @staticmethod
-    def list_devices() -> list[CCDevice]:
-        return [CCDevice(device) for device in list_ports.comports()]
+    @classmethod
+    def list_devices(cls) -> list[CCDevice]:
+        return [cls(device) for device in list_ports.comports()]
