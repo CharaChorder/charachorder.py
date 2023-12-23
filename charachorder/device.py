@@ -2,9 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, NamedTuple
 
-if TYPE_CHECKING:
-    from typing_extensions import Self
-
 from serial import Serial
 from serial.tools import list_ports
 
@@ -15,6 +12,8 @@ from .errors import (
     UnknownVendor,
 )
 
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 pid_mapping = {}
 vid_mapping = {
