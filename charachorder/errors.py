@@ -33,6 +33,13 @@ class SerialException(CharaChorderException):
     """An exception raised when something went wrong during Serial I/O"""
 
 
+class SerialConnectionNotFound(SerialException):
+    def __init__(self) -> None:
+        super().__init__(
+            "Serial connection does not exist. Did you open the connection?"
+        )
+
+
 class UnknownCommand(SerialException):
     """An exception raised when an unknown command is passed to the Serial API"""
 

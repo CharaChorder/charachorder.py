@@ -5,9 +5,15 @@ from typing import TYPE_CHECKING, Literal, NamedTuple
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+from serial import Serial
 from serial.tools import list_ports
 
-from .errors import UnknownProduct, UnknownVendor
+from .errors import (
+    SerialConnectionNotFound,
+    UnknownCommand,
+    UnknownProduct,
+    UnknownVendor,
+)
 
 
 pid_mapping = {}
@@ -74,6 +80,36 @@ class CharaChorder(Device):
             if issubclass(subclass, cls):
                 devices.append(subclass(device))
         return devices
+
+    def open(self):
+        self.connection = Serial(self.port, 115200, timeout=1)
+
+    def close(self):
+        self.connection.close()
+
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def execute(self, *args: int | str) -> tuple[str, ...]:
+        # TODO: Also detect a "closed" connection object
+        if self.connection is None:
+            raise SerialConnectionNotFound
+
+        command = " ".join(map(str, args))
+        self.connection.write(f"{command}\r\n".encode("utf-8"))
+        output = tuple(self.connection.readline().decode("utf-8").strip().split(" "))
+
+        command_from_output = output[: len(args)]
+        actual_output = output[len(args) :]
+
+        if command_from_output[0] == "UKN":
+            raise UnknownCommand(command)
+
+        return actual_output
 
 
 @allowed_product_ids(0x800F)  # M0
