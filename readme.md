@@ -17,10 +17,10 @@ A wrapper for CharaChorder's Serial API written in Python
 
 ```sh
 # Linux/macOS
-python3 -m pip install -U discord.py
+python3 -m pip install -U charachorder
 
 # Windows
-py -3 -m pip install -U discord.py
+py -3 -m pip install -U charachorder
 ```
 
 To install the development version, run the following:
@@ -36,8 +36,14 @@ python3 -m pip install -U .
 from charachorder import CharaChorder
 
 for device in CharaChorder.list_devices():
+    # Method 1
     with device:
-        print(device.execute("ID"))
+        print(device.get_id())
+
+    # Method 2
+    device.open()
+    print(device.get_id())
+    device.close()
 ```
 
 ## Links
