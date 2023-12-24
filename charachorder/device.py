@@ -11,6 +11,7 @@ from .errors import (
     UnknownProduct,
     UnknownVendor,
 )
+from .types import KeymapCode, ParameterCode
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -109,6 +110,104 @@ class CharaChorder(Device):
             raise UnknownCommand(command)
 
         return actual_output
+
+    # ID
+    def get_id(self) -> str:
+        return " ".join(self.execute("ID"))
+
+    # VERSION
+    def get_version(self) -> str:
+        return self.execute("VERSION")[0]
+
+    # CML
+
+    def get_chordmap_count(self) -> int:
+        return int(self.execute("CML", "C0")[0])
+
+    def get_chordmap_by_index(self, index: int) -> tuple[str, str]:
+        if index not in range(self.get_chordmap_count()):
+            raise IndexError("Chordmap index out of range")
+
+        chord, chordmap, success = self.execute("CML", "C1", index)
+        return chord, chordmap
+
+    def get_chordmap_by_chord(self, chord: str) -> str | None:
+        chordmap = self.execute("CML", "C2", chord)[0]
+        return chordmap if chordmap != "0" else None
+
+    def set_chordmap_by_chord(self, chord: str, chordmap: str) -> bool:
+        return self.execute("CML", "C3", chord, chordmap)[0] == "0"
+
+    def del_chordmap_by_chord(self, chord: str) -> bool:
+        return self.execute("CML", "C4", chord)[0] == "0"
+
+    # VAR
+
+    def commit(self) -> bool:
+        return self.execute("VAR", "B0")[0] == "0"
+
+    def get_parameter(self, code: ParameterCode) -> int:
+        # TODO: enforce checking device-specific codes
+        return int(self.execute("VAR", "B1", code.value)[0])
+
+    def set_parameter(self, code: ParameterCode, value: int) -> bool:
+        # TODO: validate value
+        return self.execute("VAR", "B2", code.value, value)[0] == "0"
+
+    def get_keymap(self, code: KeymapCode, index: int) -> int:
+        if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
+            raise IndexError("Keymap index out of range. Must be between 0-89")
+        if issubclass(self.__class__, CharaChorderLite) and index not in range(67):
+            raise IndexError("Keymap index out of range. Must be between 0-66")
+
+        return int(self.execute("VAR", "B3", code.value, index)[0])
+
+    def set_keymap(self, code: KeymapCode, index: int, action_id: int) -> bool:
+        if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
+            raise IndexError("Keymap index out of range. Must be between 0-89")
+        if issubclass(self.__class__, CharaChorderLite) and index not in range(67):
+            raise IndexError("Keymap index out of range. Must be between 0-66")
+        if action_id not in range(8, 2048):
+            raise IndexError("Action id out of range. Must be between 8-2047")
+
+        return self.execute("VAR", "B4", code.value, index, action_id)[0] == "0"
+
+    # RST
+
+    def restart(self):
+        self.execute("RST")
+
+    def factory_reset(self):
+        self.execute("RST", "FACTORY")
+
+    def enter_bootloader_mode(self):
+        self.execute("RST", "BOOTLOADER")
+
+    def reset_parameters(self):
+        self.execute("RST", "PARAMS")
+
+    def reset_keymaps(self):
+        self.execute("RST", "KEYMAPS")
+
+    def append_starter_chords(self):
+        self.execute("RST", "STARTER")
+
+    def nuke_chordmaps(self):
+        self.execute("RST", "CLEARCML")
+
+    def upgrade_chordmaps(self):
+        self.execute("RST", "UPGRADECML")
+
+    def append_functional_chords(self):
+        self.execute("RST", "FUNC")
+
+    # RAM
+    def get_available_ram(self) -> int:
+        return int(self.execute("RAM")[0])
+
+    # SIM
+    def sim(self, subcommand: str, value: str) -> str:
+        return self.execute("SIM", subcommand, value)[0]
 
 
 @allowed_product_ids(0x800F)  # M0
