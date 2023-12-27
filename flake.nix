@@ -25,7 +25,9 @@
           (flakey-devShell-pkgs.vscodium.override {
             environments = [ "nix" "python" ];
             extensions = with vscode-extensions; [
+              redhat.vscode-yaml
               tamasfe.even-better-toml
+              yzhang.markdown-all-in-one
             ];
           })
         ];
