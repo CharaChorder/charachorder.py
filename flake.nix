@@ -8,29 +8,36 @@
 
   outputs = inputs@{ nixpkgs, flakey-devShells, ... }:
     let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-      flakey-devShell-pkgs = flakey-devShells.outputs.packages.${system};
+      systems = [ "i686-linux" "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+      nixpkgsFor = function: forAllSystems (system: function nixpkgs.legacyPackages.${system});
     in
     {
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          mdbook
-          (python38.withPackages (py-pkgs: with py-pkgs; [
-            pyserial
-            setuptools
-          ]))
+      packages = nixpkgsFor (pkgs: { default = pkgs.python3Packages.callPackage ./package.nix { }; });
 
-          (flakey-devShell-pkgs.default.override { environments = [ "nix" ]; })
-          (flakey-devShell-pkgs.vscodium.override {
-            environments = [ "nix" "python" ];
-            extensions = with vscode-extensions; [
-              redhat.vscode-yaml
-              tamasfe.even-better-toml
-              yzhang.markdown-all-in-one
-            ];
-          })
-        ];
-      };
+      devShell = forAllSystems (system:
+        let
+          flakey-devShell-pkgs = flakey-devShells.outputs.packages.${system};
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        with pkgs; mkShell {
+          buildInputs = [
+            mdbook
+            (python38.withPackages (py-pkgs: with py-pkgs; [
+              pyserial
+              setuptools
+            ]))
+
+            (flakey-devShell-pkgs.default.override { environments = [ "nix" ]; })
+            (flakey-devShell-pkgs.vscodium.override {
+              environments = [ "nix" "python" ];
+              extensions = with vscode-extensions; [
+                redhat.vscode-yaml
+                tamasfe.even-better-toml
+                yzhang.markdown-all-in-one
+              ];
+            })
+          ];
+        });
     };
 }
