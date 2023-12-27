@@ -48,6 +48,6 @@ for device in CharaChorder.list_devices():
 
 ## Links
 
-- Documentation (TODO)
+- [Documentation](https://getpsyched.github.io/charachorder.py)
 - [CharaChorder's Official Discord Server](https://discord.gg/QZJeZGtznG)
 - [Serial API](https://docs.charachorder.com/SerialAPI.html)

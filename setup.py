@@ -22,6 +22,7 @@ setup(
     author="GetPsyched",
     author_email="dev@getpsyched.dev",
     project_urls={
+        "Documentation": "https://getpsyched.github.io/charachorder.py",
         "Issue tracker": f"{PROJECT_URL}/issues",
     },
     packages=["charachorder"],
