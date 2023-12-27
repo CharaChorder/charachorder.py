@@ -15,6 +15,7 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = with pkgs; [
+          mdbook
           (python38.withPackages (py-pkgs: with py-pkgs; [
             pyserial
             setuptools

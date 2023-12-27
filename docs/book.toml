@@ -1,0 +1,10 @@
+[book]
+title = "charachorder.py documentation"
+description = "A wrapper for CharaChorder's Serial API written in Python"
+authors = ["GetPsyched"]
+language = "en"
+multilingual = false
+
+[output.html]
+git-repository-url = "https://github.com/GetPsyched/charachorder.py/tree/master/docs"
+edit-url-template = "https://github.com/GetPsyched/charachorder.py/edit/master/docs/{path}"
