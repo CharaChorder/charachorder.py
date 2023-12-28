@@ -30,7 +30,7 @@ Running `nix shell github:GetPsyched/charachorder.py` will spawn a shell with Py
 
 ## Using shell.nix or flake.nix
 
-Simply copy this derivation into your project and call it using `python3Packages.callPackage ./charachorder.nix { }`.
+Simply copy this derivation into your project and call it using `python3Packages.callPackage ./charachorder.nix { }`. If you don't know where to paste this, then this installation method is probably not for you.
 
 ```nix
 { buildPythonPackage, fetchFromGitHub, lib, pythonOlder, pyserial }:
