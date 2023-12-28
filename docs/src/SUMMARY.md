@@ -2,6 +2,6 @@
 
 # User Guide
 
-- [Introduction](./README.md)
+- [Introduction](./readme.md)
 - [Installation](./installation.md)
 - [Quickstart](./quick-start.md)
