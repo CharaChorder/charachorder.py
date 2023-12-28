@@ -1,3 +1,6 @@
 # Summary
 
-[Introduction](./README.md)
+# User Guide
+
+- [Introduction](./README.md)
+- [Installation](./installation.md)
