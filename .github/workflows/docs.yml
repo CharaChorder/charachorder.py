@@ -9,8 +9,8 @@ jobs:
   publish-ghp:
     name: Upload documentation to GH Pages
     runs-on: ubuntu-latest
+    environment: Documentation
     permissions:
-      contents: write # To push a branch
       pages: write # To push to a GitHub Pages site
       id-token: write # To update the deployment status
 
