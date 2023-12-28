@@ -19,29 +19,31 @@
         ] ++ (callPackage ./package.nix { }).nativeBuildInputs);
       });
 
-      devShell = forAllSystems (system:
-        let
-          flakey-devShell-pkgs = flakey-devShells.outputs.packages.${system};
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        with pkgs; mkShell {
-          buildInputs = [
-            mdbook
-            (python38.withPackages (py-pkgs: with py-pkgs; [
-              pyserial
-              setuptools
-            ]))
+      devShells = forAllSystems (system: {
+        default =
+          let
+            flakey-devShell-pkgs = flakey-devShells.outputs.packages.${system};
+            pkgs = nixpkgs.legacyPackages.${system};
+          in
+          with pkgs; mkShell {
+            buildInputs = [
+              mdbook
+              (python38.withPackages (py-pkgs: with py-pkgs; [
+                pyserial
+                setuptools
+              ]))
 
-            (flakey-devShell-pkgs.default.override { environments = [ "nix" ]; })
-            (flakey-devShell-pkgs.vscodium.override {
-              environments = [ "nix" "python" ];
-              extensions = with vscode-extensions; [
-                redhat.vscode-yaml
-                tamasfe.even-better-toml
-                yzhang.markdown-all-in-one
-              ];
-            })
-          ];
-        });
+              (flakey-devShell-pkgs.default.override { environments = [ "nix" ]; })
+              (flakey-devShell-pkgs.vscodium.override {
+                environments = [ "nix" "python" ];
+                extensions = with vscode-extensions; [
+                  redhat.vscode-yaml
+                  tamasfe.even-better-toml
+                  yzhang.markdown-all-in-one
+                ];
+              })
+            ];
+          };
+      });
     };
 }
