@@ -13,7 +13,11 @@
       nixpkgsFor = function: forAllSystems (system: function nixpkgs.legacyPackages.${system});
     in
     {
-      packages = nixpkgsFor (pkgs: { default = pkgs.python3Packages.callPackage ./package.nix { }; });
+      packages = nixpkgsFor (pkgs: {
+        default = pkgs.python3.withPackages (py-pkgs: with py-pkgs; [
+          (callPackage ./package.nix { })
+        ] ++ (callPackage ./package.nix { }).nativeBuildInputs);
+      });
 
       devShell = forAllSystems (system:
         let
