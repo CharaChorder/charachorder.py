@@ -28,7 +28,7 @@
           with pkgs; mkShell {
             buildInputs = [
               mdbook
-              (python38.withPackages (py-pkgs: with py-pkgs; [
+              (python39.withPackages (py-pkgs: with py-pkgs; [
                 pynput
                 pyserial
                 setuptools

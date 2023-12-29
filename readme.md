@@ -13,7 +13,7 @@ A wrapper for CharaChorder's Serial API written in Python
 
 ## Installation
 
-**Python 3.8 or higher is required.**
+**Python 3.9 or higher is required.**
 
 ```sh
 # Linux/macOS
