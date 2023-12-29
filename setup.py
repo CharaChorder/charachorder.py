@@ -12,7 +12,7 @@ with open("charachorder/__init__.py") as f:
 PROJECT_URL = "https://github.com/GetPsyched/charachorder.py"
 
 setup(
-    name="charachorder",
+    name="charachorder.py",
     version=version,
     license="MIT",
     description="A wrapper for CharaChorder's Serial API written in Python",

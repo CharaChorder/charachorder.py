@@ -1,7 +1,7 @@
 { buildPythonPackage, lib, pythonOlder, pyserial }:
 
 buildPythonPackage rec {
-  pname = "charachorder";
+  pname = "charachorder.py";
   version = "0.2.2";
   format = "setuptools";
 
@@ -13,7 +13,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "A wrapper for CharaChorder's Serial API written in Python";
-    downloadPage = "https://pypi.org/project/charachorder/#files";
+    downloadPage = "https://pypi.org/project/charachorder.py/#files";
     homepage = "https://github.com/GetPsyched/charachorder.py";
     license = licenses.mit;
     maintainers = [ maintainers.getpsyched ];

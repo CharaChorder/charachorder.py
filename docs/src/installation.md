@@ -8,10 +8,10 @@ You can use [pip](https://pip.pypa.io/en/stable) to install the package from PyP
 
 ```sh
 # Linux/macOS
-python3 -m pip install -U charachorder
+python3 -m pip install -U charachorder.py
 
 # Windows
-py -3 -m pip install -U charachorder
+py -3 -m pip install -U charachorder.py
 ```
 
 ## From source
@@ -36,7 +36,7 @@ Simply copy this derivation into your project and call it using `python3Packages
 { buildPythonPackage, fetchFromGitHub, lib, pythonOlder, pyserial }:
 
 buildPythonPackage rec {
-  pname = "charachorder";
+  pname = "charachorder.py";
   version = "0.2.2";
   format = "setuptools";
 
@@ -44,7 +44,7 @@ buildPythonPackage rec {
 
   src = fetchFromGitHub {
     owner = "GetPsyched";
-    repo = "charachorder.py";
+    repo = pname;
     rev = "v${version}";
     hash = ""; # FIXME: Fill the hash here. Hint: Run this once and you will get the hash in the error
   };
@@ -53,7 +53,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "A wrapper for CharaChorder's Serial API written in Python";
-    downloadPage = "https://pypi.org/project/charachorder/#files";
+    downloadPage = "https://pypi.org/project/charachorder.py/#files";
     homepage = "https://github.com/GetPsyched/charachorder.py";
     license = licenses.mit;
     maintainers = [ maintainers.getpsyched ];

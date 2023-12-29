@@ -17,10 +17,10 @@ A wrapper for CharaChorder's Serial API written in Python
 
 ```sh
 # Linux/macOS
-python3 -m pip install -U charachorder
+python3 -m pip install -U charachorder.py
 
 # Windows
-py -3 -m pip install -U charachorder
+py -3 -m pip install -U charachorder.py
 ```
 
 To install the development version, run the following:
