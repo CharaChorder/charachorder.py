@@ -17,4 +17,5 @@ __version__ = "0.2.2"
 
 from .device import *
 from .errors import *
+from .logger import *
 from .types import *

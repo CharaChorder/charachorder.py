@@ -29,6 +29,7 @@
             buildInputs = [
               mdbook
               (python38.withPackages (py-pkgs: with py-pkgs; [
+                pynput
                 pyserial
                 setuptools
               ]))

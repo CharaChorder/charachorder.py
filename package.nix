@@ -1,4 +1,4 @@
-{ buildPythonPackage, lib, pythonOlder, pyserial }:
+{ buildPythonPackage, lib, pythonOlder, pynput, pyserial }:
 
 buildPythonPackage rec {
   pname = "charachorder";
@@ -9,7 +9,7 @@ buildPythonPackage rec {
 
   src = ./.;
 
-  nativeBuildInputs = [ pyserial ];
+  nativeBuildInputs = [ pynput pyserial ];
 
   meta = with lib; {
     description = "A wrapper for CharaChorder's Serial API written in Python";
