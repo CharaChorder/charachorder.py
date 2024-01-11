@@ -52,10 +52,16 @@ class Device(NamedTuple):
 
 class CharaChorder(Device):
     bootloader_mode: bool
+    connection: Serial
     chipset: Literal["M0", "S2"]
     vendor: Literal["Adafruit", "Espressif"]
 
     def __init__(self, product_id: int, vendor_id: int, port: str):
+        self.connection = Serial(baudrate=115200, timeout=1)
+        # The port is specified separately so that
+        # the connection is not immediately opened
+        self.connection.port = port
+
         if product_id not in pid_mapping:
             raise UnknownProduct(product_id)
 
@@ -84,7 +90,7 @@ class CharaChorder(Device):
         return devices
 
     def open(self):
-        self.connection = Serial(self.port, 115200, timeout=1)
+        self.connection.open()
 
     def close(self):
         self.connection.close()
@@ -97,8 +103,7 @@ class CharaChorder(Device):
         self.close()
 
     def execute(self, *args: int | str) -> tuple[str, ...]:
-        # TODO: Also detect a "closed" connection object
-        if self.connection is None:
+        if self.connection.is_open is False:
             raise SerialConnectionNotFound
 
         command = " ".join(map(str, args))
