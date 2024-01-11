@@ -18,6 +18,5 @@ buildPythonPackage rec {
     license = licenses.mit;
     maintainers = [ maintainers.getpsyched ];
     platforms = platforms.all;
-    sourceProvenance = [ sourceTypes.fromSource ];
   };
 }
