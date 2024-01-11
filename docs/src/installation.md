@@ -57,7 +57,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/GetPsyched/charachorder.py";
     license = licenses.mit;
     maintainers = [ maintainers.getpsyched ];
-    platforms = platforms.all;
   };
 }
 ```
