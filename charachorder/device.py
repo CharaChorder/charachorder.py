@@ -38,10 +38,10 @@ class Device(NamedTuple):
     port: str
 
     @classmethod
-    def list_devices(cls) -> list[Self]:
+    def list_devices(cls) -> list[Device]:
         devices = []
         for port_info in list_ports.comports():
-            device = cls(
+            device = Device(
                 product_id=port_info.pid,
                 vendor_id=port_info.vid,
                 port=port_info.device,
