@@ -55,14 +55,14 @@ class CharaChorder(Device):
     chipset: Literal["M0", "S2"]
     vendor: Literal["Adafruit", "Espressif"]
 
-    def __init__(self, device: Device):
-        if device.product_id not in pid_mapping:
-            raise UnknownProduct(device.product_id)
+    def __init__(self, product_id: int, vendor_id: int, port: str):
+        if product_id not in pid_mapping:
+            raise UnknownProduct(product_id)
 
-        if device.vendor_id in vid_mapping:
-            self.name, self.chipset = vid_mapping[device.vendor_id]
+        if vendor_id in vid_mapping:
+            self.name, self.chipset = vid_mapping[vendor_id]
         else:
-            raise UnknownVendor(device.vendor_id)
+            raise UnknownVendor(vendor_id)
 
         self.name = f"{self.__class__.__name__} {self.chipset}"
 
@@ -78,7 +78,9 @@ class CharaChorder(Device):
         for device in super().list_devices():
             subclass = pid_mapping.get(device.product_id, cls)
             if issubclass(subclass, cls):
-                devices.append(subclass(device))
+                devices.append(
+                    subclass(device.product_id, device.vendor_id, device.port)
+                )
         return devices
 
     def open(self):
@@ -221,8 +223,8 @@ class CharaChorderOne(CharaChorder):
     0x812F,  # S2 - UF2 Bootloader
 )
 class CharaChorderLite(CharaChorder):
-    def __init__(self, device: CharaChorder):
-        super().__init__(device)
+    def __init__(self, product_id: int, vendor_id: int, port: str):
+        super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id == 0x812F
 
 
@@ -233,8 +235,8 @@ class CharaChorderLite(CharaChorder):
     0x818E,  # S2 Host - UF2 Bootloader
 )
 class CharaChorderX(CharaChorder):
-    def __init__(self, device: CharaChorder):
-        super().__init__(device)
+    def __init__(self, product_id: int, vendor_id: int, port: str):
+        super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id in (0x818C, 0x818E)
 
 
@@ -243,6 +245,6 @@ class CharaChorderX(CharaChorder):
     0x818A,  # S2 - UF2 Bootloader
 )
 class CharaChorderEngine(CharaChorder):
-    def __init__(self, device: CharaChorder):
-        super().__init__(device)
+    def __init__(self, product_id: int, vendor_id: int, port: str):
+        super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id == 0x818A
