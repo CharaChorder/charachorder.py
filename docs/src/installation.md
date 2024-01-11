@@ -44,7 +44,7 @@ buildPythonPackage rec {
 
   src = fetchFromGitHub {
     owner = "GetPsyched";
-    repo = pname;
+    repo = "charachorder.py";
     rev = "v${version}";
     hash = ""; # FIXME: Fill the hash here. Hint: Run this once and you will get the hash in the error
   };
