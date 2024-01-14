@@ -135,15 +135,15 @@ class CharaChorder(Device):
         if index not in range(self.get_chordmap_count()):
             raise IndexError("Chordmap index out of range")
 
-        chord, chordmap, success = self.execute("CML", "C1", index)
-        return chord, chordmap
+        chord, phrase, success = self.execute("CML", "C1", index)
+        return chord, phrase
 
     def get_chordmap_by_chord(self, chord: str) -> str | None:
-        chordmap = self.execute("CML", "C2", chord)[0]
-        return chordmap if chordmap != "0" else None
+        phrase = self.execute("CML", "C2", chord)[0]
+        return phrase if phrase != "0" else None
 
-    def set_chordmap_by_chord(self, chord: str, chordmap: str) -> bool:
-        return self.execute("CML", "C3", chord, chordmap)[0] == "0"
+    def set_chordmap_by_chord(self, chord: str, phrase: str) -> bool:
+        return self.execute("CML", "C3", chord, phrase)[0] == "0"
 
     def del_chordmap_by_chord(self, chord: str) -> bool:
         return self.execute("CML", "C4", chord)[0] == "0"
