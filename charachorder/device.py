@@ -118,15 +118,11 @@ class CharaChorder(Device):
 
         return actual_output
 
-    # ID
     def get_id(self) -> str:
         return " ".join(self.execute("ID"))
 
-    # VERSION
     def get_version(self) -> str:
         return self.execute("VERSION")[0]
-
-    # CML
 
     def get_chordmap_count(self) -> int:
         return int(self.execute("CML", "C0")[0])
@@ -138,17 +134,25 @@ class CharaChorder(Device):
         chord, phrase, success = self.execute("CML", "C1", index)
         return Chord(chord), ChordPhrase(phrase)
 
+    def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
+        chordmap_count = self.get_chordmap_count()
+        return (self.get_chordmap(i) for i in range(chordmap_count))
+
     def get_chord_phrase(self, chord: str) -> ChordPhrase | None:
         phrase = self.execute("CML", "C2", chord)[0]
         return ChordPhrase(phrase) if phrase != "0" else None
 
-    def set_chordmap_by_chord(self, chord: Chord, phrase: ChordPhrase) -> bool:
+    def set_chordmap(self, chord: Chord, phrase: ChordPhrase) -> bool:
         return self.execute("CML", "C3", chord.raw, phrase.raw)[0] == "0"
 
-    def del_chordmap_by_chord(self, chord: Chord) -> bool:
+    def delete_chordmap(self, chord: Chord) -> bool:
         return self.execute("CML", "C4", chord.raw)[0] == "0"
 
-    # VAR
+    def delete_chordmaps(self):
+        self.execute("RST", "CLEARCML")
+
+    def upgrade_chordmaps(self):
+        self.execute("RST", "UPGRADECML")
 
     def commit(self) -> bool:
         return self.execute("VAR", "B0")[0] == "0"
@@ -179,8 +183,6 @@ class CharaChorder(Device):
 
         return self.execute("VAR", "B4", code.value, index, action_id)[0] == "0"
 
-    # RST
-
     def restart(self):
         self.execute("RST")
 
@@ -199,28 +201,14 @@ class CharaChorder(Device):
     def append_starter_chords(self):
         self.execute("RST", "STARTER")
 
-    def nuke_chordmaps(self):
-        self.execute("RST", "CLEARCML")
-
-    def upgrade_chordmaps(self):
-        self.execute("RST", "UPGRADECML")
-
     def append_functional_chords(self):
         self.execute("RST", "FUNC")
 
-    # RAM
     def get_available_ram(self) -> int:
         return int(self.execute("RAM")[0])
 
-    # SIM
     def sim(self, subcommand: str, value: str) -> str:
         return self.execute("SIM", subcommand, value)[0]
-
-    # Misc. custom abstractions
-
-    def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
-        chordmap_count = self.get_chordmap_count()
-        return (self.get_chordmap(i) for i in range(chordmap_count))
 
 
 @allowed_product_ids(0x800F)  # M0
