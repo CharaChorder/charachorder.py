@@ -11,7 +11,7 @@ from .errors import (
     UnknownProduct,
     UnknownVendor,
 )
-from .types import KeymapCode, ParameterCode
+from .types import Chord, ChordPhrase, KeymapCode, ParameterCode
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -131,22 +131,22 @@ class CharaChorder(Device):
     def get_chordmap_count(self) -> int:
         return int(self.execute("CML", "C0")[0])
 
-    def get_chordmap_by_index(self, index: int) -> tuple[str, str]:
+    def get_chordmap_by_index(self, index: int) -> tuple[Chord, ChordPhrase]:
         if index not in range(self.get_chordmap_count()):
             raise IndexError("Chordmap index out of range")
 
         chord, phrase, success = self.execute("CML", "C1", index)
-        return chord, phrase
+        return Chord(chord), ChordPhrase(phrase)
 
-    def get_chordmap_by_chord(self, chord: str) -> str | None:
+    def get_chordmap_by_chord(self, chord: str) -> ChordPhrase | None:
         phrase = self.execute("CML", "C2", chord)[0]
-        return phrase if phrase != "0" else None
+        return ChordPhrase(phrase) if phrase != "0" else None
 
-    def set_chordmap_by_chord(self, chord: str, phrase: str) -> bool:
-        return self.execute("CML", "C3", chord, phrase)[0] == "0"
+    def set_chordmap_by_chord(self, chord: Chord, phrase: ChordPhrase) -> bool:
+        return self.execute("CML", "C3", chord.raw, phrase.raw)[0] == "0"
 
-    def del_chordmap_by_chord(self, chord: str) -> bool:
-        return self.execute("CML", "C4", chord)[0] == "0"
+    def del_chordmap_by_chord(self, chord: Chord) -> bool:
+        return self.execute("CML", "C4", chord.raw)[0] == "0"
 
     # VAR
 

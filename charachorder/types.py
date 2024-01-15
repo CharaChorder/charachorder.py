@@ -1,4 +1,59 @@
+from dataclasses import dataclass
 from enum import Enum
+
+
+@dataclass
+class Chord:
+    raw: str
+
+    def __str__(self) -> str:
+        chord = int(self.raw, 16)
+
+        actions = []
+        for _ in range(12):
+            action = int(chord & 0x3FF)
+            if action != 0:
+                actions.append(chr(action))
+            chord >>= 10
+
+        return "".join(actions)
+
+
+@dataclass
+class ChordPhrase:
+    raw: str
+
+    def __str__(self) -> str:
+        numeric_action_codes = []
+        for i in range(0, len(self.raw), 2):
+            numeric_action_codes.append(int(self.raw[i : i + 2], 16))
+
+        action_codes = []
+        for i, action_code in enumerate(numeric_action_codes):
+            if action_code in range(32):  # 10-bit scan code
+                action_codes[i + 1] = (action_code << 8) | action_codes[i + 1]
+
+            elif action_code in range(32, 127):  # Alphanumeric
+                action_codes.append(chr(action_code))
+
+            elif action_code == 296:  # Line break
+                action_codes.append("\n")
+
+            elif action_code == 298 and len(action_codes) > 0:  # Backspace
+                action_codes.pop()
+
+            elif action_code == 299:  # Tab
+                action_codes.append("\t")
+
+            elif action_code == 544:  # Spaceright
+                action_codes.append(" ")
+
+            elif action_code > 126:  # Currently unsupported
+                action_codes.append(f"<{action_code}>")
+
+            else:
+                action_codes.append(chr(action_code))
+        return "".join(action_codes)
 
 
 class KeymapCode(Enum):
