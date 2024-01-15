@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, NamedTuple
+from typing import TYPE_CHECKING, Generator, Literal, NamedTuple
 
 from serial import Serial
 from serial.tools import list_ports
@@ -215,6 +215,12 @@ class CharaChorder(Device):
     # SIM
     def sim(self, subcommand: str, value: str) -> str:
         return self.execute("SIM", subcommand, value)[0]
+
+    # Misc. custom abstractions
+
+    def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
+        chordmap_count = self.get_chordmap_count()
+        return (self.get_chordmap(i) for i in range(chordmap_count))
 
 
 @allowed_product_ids(0x800F)  # M0
