@@ -1,5 +1,11 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 @dataclass
@@ -17,6 +23,13 @@ class Chord:
             chord >>= 10
 
         return "".join(actions)
+
+    @classmethod
+    def to_raw(cls, chord: str) -> Self:
+        raw = 0
+        for i in range(1, len(chord) + 1):
+            raw |= (ord(chord[-i]) & 0x3FF) << (12 - i) * 10
+        return cls(format(raw, "032X"))
 
 
 @dataclass
@@ -54,6 +67,23 @@ class ChordPhrase:
             else:
                 action_codes.append(chr(action_code))
         return "".join(action_codes)
+
+    @classmethod
+    def to_raw(cls, phrase: str) -> Self:
+        def compress_phrase(phrase):
+            buffer = bytearray(len(phrase) * 2)
+            i = 0
+            for char in phrase:
+                action = ord(char)
+                if action > 0xFF:
+                    buffer[i] = action >> 8
+                    i += 1
+                buffer[i] = action & 0xFF
+                i += 1
+            return buffer[:i]
+
+        compressed_actions = compress_phrase(phrase)
+        return cls("".join(format(action, "02X") for action in compressed_actions))
 
 
 class KeymapCode(Enum):
