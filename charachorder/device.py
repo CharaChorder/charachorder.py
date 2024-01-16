@@ -191,7 +191,7 @@ class CharaChorder(Device):
         return int(self.execute("VAR", "B1", code.value)[0])
 
     def set_parameter(
-        self, code: ParameterCode, value: int, commit: bool = False
+        self, code: ParameterCode, value: int, *, commit: bool = False
     ) -> bool:
         # TODO: validate value
         success = self.execute("VAR", "B2", code.value, value)[0] == "0"
@@ -208,7 +208,7 @@ class CharaChorder(Device):
         return int(self.execute("VAR", "B3", code.value, index)[0])
 
     def set_keymap(
-        self, code: KeymapCode, index: int, action_id: int, commit: bool = False
+        self, code: KeymapCode, index: int, action_id: int, *, commit: bool = False
     ) -> bool:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
             raise IndexError("Keymap index out of range. Must be between 0-89")
