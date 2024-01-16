@@ -157,7 +157,8 @@ class CharaChorder(Device):
             if index == limit:
                 break
 
-            if interrupted := (manual_interrupt() or timed_out()):
+            if manual_interrupt() or timed_out():
+                interrupted = True
                 break
 
             chordmaps.append(chordmap)
