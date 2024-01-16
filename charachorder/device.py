@@ -186,6 +186,11 @@ class CharaChorder(Device):
     def commit(self) -> bool:
         return self.execute("VAR", "B0")[0] == "0"
 
+    def _maybe_commit(self, success, commit: bool) -> bool:
+        if success and commit:
+            return self.commit()
+        return success
+
     def get_parameter(self, code: ParameterCode) -> int:
         # TODO: enforce checking device-specific codes
         return int(self.execute("VAR", "B1", code.value)[0])
@@ -194,10 +199,9 @@ class CharaChorder(Device):
         self, code: ParameterCode, value: int, *, commit: bool = False
     ) -> bool:
         # TODO: validate value
-        success = self.execute("VAR", "B2", code.value, value)[0] == "0"
-        if success and commit:
-            return self.commit()
-        return success
+        return self._maybe_commit(
+            self.execute("VAR", "B2", code.value, value)[0] == "0", commit
+        )
 
     def get_keymap(self, code: KeymapCode, index: int) -> int:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
@@ -217,10 +221,9 @@ class CharaChorder(Device):
         if action_id not in range(8, 2048):
             raise IndexError("Action id out of range. Must be between 8-2047")
 
-        success = self.execute("VAR", "B4", code.value, index, action_id)[0] == "0"
-        if success and commit:
-            return self.commit()
-        return success
+        return self._maybe_commit(
+            self.execute("VAR", "B4", code.value, index, action_id)[0] == "0", commit
+        )
 
     def restart(self):
         self.execute("RST")
