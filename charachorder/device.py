@@ -190,9 +190,14 @@ class CharaChorder(Device):
         # TODO: enforce checking device-specific codes
         return int(self.execute("VAR", "B1", code.value)[0])
 
-    def set_parameter(self, code: ParameterCode, value: int) -> bool:
+    def set_parameter(
+        self, code: ParameterCode, value: int, commit: bool = False
+    ) -> bool:
         # TODO: validate value
-        return self.execute("VAR", "B2", code.value, value)[0] == "0"
+        success = self.execute("VAR", "B2", code.value, value)[0] == "0"
+        if success and commit:
+            return self.commit()
+        return success
 
     def get_keymap(self, code: KeymapCode, index: int) -> int:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
@@ -202,7 +207,9 @@ class CharaChorder(Device):
 
         return int(self.execute("VAR", "B3", code.value, index)[0])
 
-    def set_keymap(self, code: KeymapCode, index: int, action_id: int) -> bool:
+    def set_keymap(
+        self, code: KeymapCode, index: int, action_id: int, commit: bool = False
+    ) -> bool:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
             raise IndexError("Keymap index out of range. Must be between 0-89")
         if issubclass(self.__class__, CharaChorderLite) and index not in range(67):
@@ -210,7 +217,10 @@ class CharaChorder(Device):
         if action_id not in range(8, 2048):
             raise IndexError("Action id out of range. Must be between 8-2047")
 
-        return self.execute("VAR", "B4", code.value, index, action_id)[0] == "0"
+        success = self.execute("VAR", "B4", code.value, index, action_id)[0] == "0"
+        if success and commit:
+            return self.commit()
+        return success
 
     def restart(self):
         self.execute("RST")
