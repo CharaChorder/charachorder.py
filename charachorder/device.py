@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Generator, Literal, NamedTuple
+import time
+from typing import TYPE_CHECKING, Callable, Generator, Literal, NamedTuple
 
 from serial import Serial
 from serial.tools import list_ports
@@ -52,11 +53,13 @@ class Device(NamedTuple):
 
 class CharaChorder(Device):
     bootloader_mode: bool
+    chordmaps: list[tuple[Chord, ChordPhrase]]
     connection: Serial
     chipset: Literal["M0", "S2"]
     vendor: Literal["Adafruit", "Espressif"]
 
     def __init__(self, product_id: int, vendor_id: int, port: str):
+        self.chordmaps = []
         self.connection = Serial(baudrate=115200, timeout=1)
         # The port is specified separately so that
         # the connection is not immediately opened
@@ -137,6 +140,30 @@ class CharaChorder(Device):
     def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
         chordmap_count = self.get_chordmap_count()
         return (self.get_chordmap(i) for i in range(chordmap_count))
+
+    def populate_chordmaps(
+        self,
+        *,
+        limit: int | None = None,
+        manual_interrupt: Callable[[], bool] = lambda: False,
+        timeout: float | None = None,
+    ) -> None:
+        chordmaps = []
+        interrupted = False
+        start_time = time.time()
+        timed_out = lambda: timeout and time.time() - start_time > timeout
+
+        for index, chordmap in enumerate(self.get_chordmaps()):
+            if index == limit:
+                break
+
+            if interrupted := (manual_interrupt() or timed_out()):
+                break
+
+            chordmaps.append(chordmap)
+
+        if not interrupted:
+            self.chordmaps = chordmaps
 
     def get_chord_phrase(self, chord: str) -> ChordPhrase | None:
         phrase = self.execute("CML", "C2", chord)[0]
