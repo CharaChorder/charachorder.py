@@ -147,7 +147,7 @@ class CharaChorder(Device):
         limit: int | None = None,
         manual_interrupt: Callable[[], bool] = lambda: False,
         timeout: float | None = None,
-    ) -> None:
+    ) -> tuple[list[tuple[Chord, ChordPhrase]], bool]:
         chordmaps = []
         interrupted = False
         start_time = time.time()
@@ -165,6 +165,7 @@ class CharaChorder(Device):
 
         if not interrupted:
             self.chordmaps = chordmaps
+        return chordmaps, interrupted
 
     def get_chord_phrase(self, chord: str) -> ChordPhrase | None:
         phrase = self.execute("CML", "C2", chord)[0]
