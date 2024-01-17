@@ -113,14 +113,23 @@ class CharaChorder(Device):
 
         command = " ".join(map(str, args))
         self.connection.write(f"{command}\r\n".encode("utf-8"))
-        output = self.connection.readline().decode("utf-8").strip().split(" ")
 
-        # Drop serial header
-        if output[0] == "01":
-            output = output[1:]
+        def bad_output(output: list[str]) -> bool:
+            if not output:
+                return True
 
-        if output[0] == "UKN":
-            raise UnknownCommand(command)
+            # Drop serial header
+            if output[0] == "01":
+                output = output[1:]
+
+            if output[0] == "UKN":
+                raise UnknownCommand(command)
+
+            return command != " ".join(output[: len(args)])
+
+        output = []
+        while bad_output(output):  # Avoid logs/debug messages
+            output = self.connection.readline().decode("utf-8").strip().split(" ")
 
         return tuple(output[len(args) :])
 
