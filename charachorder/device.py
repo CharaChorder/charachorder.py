@@ -138,7 +138,7 @@ class CharaChorder(Device):
             raise IndexError("Chordmap index out of range")
 
         chord, phrase, success = self.execute("CML", "C1", index)
-        return Chord(chord), ChordPhrase(phrase)
+        return Chord.from_hex(chord), ChordPhrase.from_hex(phrase)
 
     def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
         chordmap_count = self.get_chordmap_count()
@@ -172,13 +172,13 @@ class CharaChorder(Device):
 
     def get_chord_phrase(self, chord: str) -> ChordPhrase | None:
         phrase = self.execute("CML", "C2", chord)[0]
-        return ChordPhrase(phrase) if phrase != "0" else None
+        return ChordPhrase.from_hex(phrase) if phrase != "0" else None
 
     def set_chordmap(self, chord: Chord, phrase: ChordPhrase) -> bool:
-        return self.execute("CML", "C3", chord.raw, phrase.raw)[0] == "0"
+        return self.execute("CML", "C3", chord.to_hex(), phrase.to_hex())[0] == "0"
 
     def delete_chordmap(self, chord: Chord) -> bool:
-        return self.execute("CML", "C4", chord.raw)[0] == "0"
+        return self.execute("CML", "C4", chord.to_hex())[0] == "0"
 
     def delete_chordmaps(self):
         self.execute("RST", "CLEARCML")
