@@ -1,6 +1,6 @@
 # charachorder.py
 
-A wrapper for CharaChorder's Serial API written in Python
+A wrapper for [CharaChorder](https://www.charachorder.com)'s [Serial API](https://docs.charachorder.com/SerialAPI.html) written in Python
 
 > **Warning:**
 > This project is in beta; breaking changes will occur without notice. Please wait for v1.0.0
@@ -8,7 +8,7 @@ A wrapper for CharaChorder's Serial API written in Python
 ## Features
 
 - Supports all major versions of Python3.
-- Exhaustive list of commands as in the [Serial API](https://docs.charachorder.com/SerialAPI.html).
+- Exhaustive list of commands as in the Serial API.
 - Events (coming soon).
 
 ## Installation
@@ -50,4 +50,3 @@ for device in CharaChorder.list_devices():
 
 - [Documentation](https://getpsyched.github.io/charachorder.py)
 - [CharaChorder's Official Discord Server](https://discord.gg/QZJeZGtznG)
-- [Serial API](https://docs.charachorder.com/SerialAPI.html)
