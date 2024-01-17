@@ -4,7 +4,7 @@ There are multiple ways to install the charachorder.py library. Choose any one o
 
 ## From PyPI
 
-You can use [pip](https://pip.pypa.io/en/stable) to install the package from PyPI
+You can use `pip` to install the package from [PyPI](https://pypi.org/project/charachorder.py)
 
 ```sh
 # Linux/macOS
