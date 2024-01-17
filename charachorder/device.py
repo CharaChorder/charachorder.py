@@ -12,7 +12,7 @@ from .errors import (
     UnknownProduct,
     UnknownVendor,
 )
-from .types import Chord, ChordPhrase, KeymapCode, ParameterCode
+from .types import Chord, ChordPhrase, KeymapCode
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -191,16 +191,12 @@ class CharaChorder(Device):
             return self.commit()
         return success
 
-    def get_parameter(self, code: ParameterCode) -> int:
-        # TODO: enforce checking device-specific codes
-        return int(self.execute("VAR", "B1", code.value)[0])
+    def get_parameter(self, code: int) -> int:
+        return int(self.execute("VAR", "B1", hex(code))[0])
 
-    def set_parameter(
-        self, code: ParameterCode, value: int, *, commit: bool = False
-    ) -> bool:
-        # TODO: validate value
+    def set_parameter(self, code: int, value: int, *, commit: bool = False) -> bool:
         return self._maybe_commit(
-            self.execute("VAR", "B2", code.value, value)[0] == "0", commit
+            self.execute("VAR", "B2", hex(code), value)[0] == "0", commit
         )
 
     def get_keymap(self, code: KeymapCode, index: int) -> int:
