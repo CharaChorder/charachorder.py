@@ -90,3 +90,12 @@ class KeymapCode(Enum):
     primary = 0xA1
     secondary = 0xA2
     tertiary = 0xA3
+
+
+class OperatingSystem(Enum):
+    Windows = 0x0
+    MacOS = 0x1
+    Linux = 0x2
+    iOS = 0x3
+    Android = 0x4
+    Unknown = 0x255

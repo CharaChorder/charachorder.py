@@ -12,7 +12,7 @@ from .errors import (
     UnknownProduct,
     UnknownVendor,
 )
-from .types import Chord, ChordPhrase, KeymapCode
+from .types import Chord, ChordPhrase, KeymapCode, OperatingSystem
 
 if TYPE_CHECKING:
     from typing_extensions import Self
