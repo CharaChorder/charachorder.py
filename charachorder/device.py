@@ -113,13 +113,10 @@ class CharaChorder(Device):
         self.connection.write(f"{command}\r\n".encode("utf-8"))
         output = tuple(self.connection.readline().decode("utf-8").strip().split(" "))
 
-        command_from_output = output[: len(args)]
-        actual_output = output[len(args) :]
-
-        if command_from_output[0] == "UKN":
+        if output[0] == "UKN":
             raise UnknownCommand(command)
 
-        return actual_output
+        return output[len(args) :]
 
     def get_id(self) -> str:
         return " ".join(self.execute("ID"))
