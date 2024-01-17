@@ -113,7 +113,7 @@ class CharaChorder(Device):
 
         command = " ".join(map(str, args))
         self.connection.write(f"{command}\r\n".encode("utf-8"))
-        output = tuple(self.connection.readline().decode("utf-8").strip().split(" "))
+        output = self.connection.readline().decode("utf-8").strip().split(" ")
 
         # Drop serial header
         if output[0] == "01":
@@ -122,7 +122,7 @@ class CharaChorder(Device):
         if output[0] == "UKN":
             raise UnknownCommand(command)
 
-        return output[len(args) :]
+        return tuple(output[len(args) :])
 
     def get_id(self) -> str:
         return " ".join(self.execute("ID"))
