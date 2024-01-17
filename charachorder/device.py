@@ -170,8 +170,8 @@ class CharaChorder(Device):
             self.chordmaps = chordmaps
         return chordmaps, interrupted
 
-    def get_chord_phrase(self, chord: str) -> ChordPhrase | None:
-        phrase = self.execute("CML", "C2", chord)[0]
+    def get_chord_phrase(self, chord: Chord) -> ChordPhrase | None:
+        phrase = self.execute("CML", "C2", chord.to_hex())[0]
         return ChordPhrase.from_hex(phrase) if phrase != "0" else None
 
     def set_chordmap(self, chord: Chord, phrase: ChordPhrase) -> bool:
