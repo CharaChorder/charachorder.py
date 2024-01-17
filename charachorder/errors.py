@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 __all__ = [
     "CharaChorderException",
     "UnknownProduct",
     "UnknownVendor",
     "SerialException",
     "UnknownCommand",
+    "InvalidParameter",
+    "InvalidParameterInput",
 ]
 
 
@@ -52,3 +56,12 @@ class InvalidParameter(SerialException):
 
     def __init__(self, code: str):
         super().__init__(f'The parameter "{code}" does not exist.')
+
+
+class InvalidParameterInput(SerialException):
+    """An exception raised when the given input for a parameter code is invalid"""
+
+    def __init__(self, code: str, value: int | str):
+        super().__init__(
+            f'The parameter value "{value}" for the code "{code}" is invalid.'
+        )

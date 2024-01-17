@@ -8,6 +8,7 @@ from serial.tools import list_ports
 
 from .errors import (
     InvalidParameter,
+    InvalidParameterInput,
     SerialConnectionNotFound,
     UnknownCommand,
     UnknownProduct,
@@ -202,9 +203,12 @@ class CharaChorder(Device):
     def set_parameter(
         self, code: int, value: int | str, *, commit: bool = False
     ) -> bool:
-        return self._maybe_commit(
-            self.execute("VAR", "B2", hex(code), value)[0] == "0", commit
-        )
+        success = self.execute("VAR", "B2", hex(code), value)[0]
+        if success != "0":
+            # Segregate invalid parameter and invalid input errors
+            self.get_parameter(code)
+            raise InvalidParameterInput(hex(code), value)
+        return self._maybe_commit(success, commit)
 
     def get_keymap(self, code: KeymapCode, index: int) -> int:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
