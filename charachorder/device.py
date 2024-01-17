@@ -114,6 +114,10 @@ class CharaChorder(Device):
         self.connection.write(f"{command}\r\n".encode("utf-8"))
         output = tuple(self.connection.readline().decode("utf-8").strip().split(" "))
 
+        # Drop serial header
+        if output[0] == "01":
+            output = output[1:]
+
         if output[0] == "UKN":
             raise UnknownCommand(command)
 
