@@ -2,7 +2,7 @@
 
 buildPythonPackage rec {
   pname = "charachorder.py";
-  version = "0.3.1";
+  version = "0.4.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.8";
