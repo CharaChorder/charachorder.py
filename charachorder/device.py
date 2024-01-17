@@ -7,6 +7,7 @@ from serial import Serial
 from serial.tools import list_ports
 
 from .errors import (
+    InvalidParameter,
     SerialConnectionNotFound,
     UnknownCommand,
     UnknownProduct,
@@ -189,7 +190,10 @@ class CharaChorder(Device):
         return success
 
     def get_parameter(self, code: int) -> int:
-        return int(self.execute("VAR", "B1", hex(code))[0])
+        value, success = self.execute("VAR", "B1", hex(code))
+        if success != "0":
+            raise InvalidParameter(hex(code))
+        return int(value)
 
     def set_parameter(
         self, code: int, value: int | str, *, commit: bool = False

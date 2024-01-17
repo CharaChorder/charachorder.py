@@ -45,3 +45,10 @@ class UnknownCommand(SerialException):
 
     def __init__(self, command: str):
         super().__init__(f'The command "{command}" does not exist')
+
+
+class InvalidParameter(SerialException):
+    """An exception raised when the given parameter code does not exist"""
+
+    def __init__(self, code: str):
+        super().__init__(f'The parameter "{code}" does not exist.')
