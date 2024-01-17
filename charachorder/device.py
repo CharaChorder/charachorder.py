@@ -194,7 +194,9 @@ class CharaChorder(Device):
     def get_parameter(self, code: int) -> int:
         return int(self.execute("VAR", "B1", hex(code))[0])
 
-    def set_parameter(self, code: int, value: int, *, commit: bool = False) -> bool:
+    def set_parameter(
+        self, code: int, value: int | str, *, commit: bool = False
+    ) -> bool:
         return self._maybe_commit(
             self.execute("VAR", "B2", hex(code), value)[0] == "0", commit
         )
