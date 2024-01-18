@@ -114,9 +114,9 @@ class CharaChorder(Device):
         command = " ".join(map(str, args))
         self.connection.write(f"{command}\r\n".encode("utf-8"))
 
-        def bad_output(output: list[str]) -> bool:
-            if not output:
-                return True
+        output = []
+        for output_bytes in self.connection.iread_until():  # Avoid logs/debug messages
+            output = output_bytes.decode("utf-8").strip().split(" ")
 
             # Drop serial header
             if output[0] == "01":
@@ -125,11 +125,8 @@ class CharaChorder(Device):
             if output[0] == "UKN":
                 raise UnknownCommand(command)
 
-            return command != " ".join(output[: len(args)])
-
-        output = []
-        while bad_output(output):  # Avoid logs/debug messages
-            output = self.connection.readline().decode("utf-8").strip().split(" ")
+            if command == " ".join(output[: len(args)]):
+                break
 
         return tuple(output[len(args) :])
 
