@@ -283,9 +283,9 @@ class CharaChorder(Device):
                 if is_same_session:
                     continue
 
+                self.connection.close()
+                self.connection.port = port
                 try:
-                    self.connection.close()
-                    self.connection.port = port
                     self.connection.open()
                 except serialutil.SerialException:
                     # There is a brief period after the device
