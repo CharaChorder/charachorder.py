@@ -109,14 +109,16 @@ class CharaChorder(Device):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def ping(self, *, timeout: float = 10.0):
+    def ping(self, *, timeout: float | None = 10.0):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
 
-        while True:
+        start_time = time.time()
+        while timeout and time.time() - start_time < timeout:
             try:
                 self.connection.write(f"CMD\r\n".encode("utf-8"))
             except serialutil.SerialException:
+                # Passing timeout here in case it is set to None
                 self._reconnect(timeout=timeout)
 
             if self.connection.readline():
@@ -146,12 +148,12 @@ class CharaChorder(Device):
 
         return tuple(output[len(args) :])
 
-    def _reconnect(self, *, timeout: float):
+    def _reconnect(self, *, timeout: float | None = 3.0):
         def is_same_device(product_id: int, vendor_id: int) -> bool:
             return product_id == self.product_id and vendor_id == self.vendor_id
 
         start_time = time.time()
-        while time.time() - start_time < timeout:
+        while timeout and time.time() - start_time < timeout:
             try:
                 ports = list_ports.comports()
             except TypeError:
