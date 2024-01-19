@@ -109,7 +109,7 @@ class CharaChorder(Device):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def ping(self, *, timeout: float | None = 10.0):
+    def ping(self, *, silent: bool = False, timeout: float | None = 10.0):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
 
@@ -124,10 +124,11 @@ class CharaChorder(Device):
             if self.connection.readline():
                 break
 
-        print("Pong!")
+        if not silent:
+            print("Pong!")
 
     def _execute(self, *args: int | str) -> tuple[str, ...]:
-        self.ping()
+        self.ping(silent=True)
 
         command = " ".join(map(str, args))
         self.connection.write(f"{command}\r\n".encode("utf-8"))
