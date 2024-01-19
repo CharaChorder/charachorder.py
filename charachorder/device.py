@@ -109,17 +109,23 @@ class CharaChorder(Device):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def _wait_until_ready(self):
+    def ping(self):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
 
         while True:
-            self.connection.write(f"CMD\r\n".encode("utf-8"))
+            try:
+                self.connection.write(f"CMD\r\n".encode("utf-8"))
+            except serialutil.SerialException:
+                self._reconnect()
+
             if self.connection.readline():
                 break
 
+        print("Pong!")
+
     def _execute(self, *args: int | str) -> tuple[str, ...]:
-        self._wait_until_ready()
+        self.ping()
 
         command = " ".join(map(str, args))
         self.connection.write(f"{command}\r\n".encode("utf-8"))
@@ -140,7 +146,7 @@ class CharaChorder(Device):
 
         return tuple(output[len(args) :])
 
-    def reconnect(self, *, timeout: float = 10.0):
+    def _reconnect(self, *, timeout: float = 10.0):
         def is_same_device(product_id: int, vendor_id: int) -> bool:
             return product_id == self.product_id and vendor_id == self.vendor_id
 
@@ -306,7 +312,7 @@ class CharaChorder(Device):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
         self.connection.write(f"RST\r\n".encode("utf-8"))
-        self.reconnect(timeout=reconnect_timeout)
+        self._reconnect(timeout=reconnect_timeout)
 
     def factory_reset(self):
         self._execute("RST", "FACTORY")
