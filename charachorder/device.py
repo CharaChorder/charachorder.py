@@ -3,13 +3,15 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING, Callable, Generator, Literal, NamedTuple
 
-from serial import Serial
+from serial import Serial, serialutil
 from serial.tools import list_ports
 
 from .errors import (
     InvalidParameter,
     InvalidParameterInput,
+    ReconnectTimeout,
     SerialConnectionNotFound,
+    TooManyDevices,
     UnknownCommand,
     UnknownProduct,
     UnknownVendor,
@@ -238,8 +240,65 @@ class CharaChorder(Device):
             self.execute("VAR", "B4", code.value, index, action_id)[0] == "0", commit
         )
 
-    def restart(self):
-        self.execute("RST")
+    def restart(self, *, timeout: float = 10.0):
+        if self.connection.is_open is False:
+            raise SerialConnectionNotFound
+        self.connection.write(f"RST\r\n".encode("utf-8"))
+
+        # Attempt to reconnect
+
+        def is_same_device(product_id: int, vendor_id: int) -> bool:
+            return product_id == self.product_id and vendor_id == self.vendor_id
+
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                ports = list_ports.comports()
+            except TypeError:
+                # Weirdly, the list_ports.comports() can fail during the device restart
+                #
+                # Traceback (most recent call last):
+                # ... snip ...
+                # File ".../serial/tools/list_ports_linux.py", line 102, in comports
+                #     for info in [SysFS(d) for d in devices]
+                # File ".../serial/tools/list_ports_linux.py", line 102, in <listcomp>
+                #     for info in [SysFS(d) for d in devices]
+                # File ".../serial/tools/list_ports_linux.py", line 52, in __init__
+                #     self.vid = int(self.read_line(self.usb_device_path, 'idVendor'), 16)
+                # TypeError: int() can't convert non-string with explicit base
+                continue
+
+            comports = [port for port in ports if is_same_device(port.pid, port.vid)]
+
+            # Device is restarting
+            if len(comports) == 0:
+                continue
+
+            # Device found
+            elif len(comports) == 1:
+                port = comports[0].device
+
+                # This is true initially when the device hasn't fully shutdown yet
+                is_same_session = port == self.port
+                if is_same_session:
+                    continue
+
+                try:
+                    self.connection.close()
+                    self.connection.port = port
+                    self.connection.open()
+                except serialutil.SerialException:
+                    # There is a brief period after the device
+                    # restarts where you cannot open a connection to it
+                    continue
+
+                break
+
+            # More than one device of the same model was found
+            elif len(comports) > 1:
+                raise TooManyDevices
+        else:
+            raise ReconnectTimeout
 
     def factory_reset(self):
         self.execute("RST", "FACTORY")
