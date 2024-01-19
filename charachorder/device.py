@@ -118,7 +118,7 @@ class CharaChorder(Device):
             if self.connection.readline():
                 break
 
-    def execute(self, *args: int | str) -> tuple[str, ...]:
+    def _execute(self, *args: int | str) -> tuple[str, ...]:
         self._wait_until_ready()
 
         command = " ".join(map(str, args))
@@ -141,19 +141,19 @@ class CharaChorder(Device):
         return tuple(output[len(args) :])
 
     def get_id(self) -> str:
-        return " ".join(self.execute("ID"))
+        return " ".join(self._execute("ID"))
 
     def get_version(self) -> str:
-        return self.execute("VERSION")[0]
+        return self._execute("VERSION")[0]
 
     def get_chordmap_count(self) -> int:
-        return int(self.execute("CML", "C0")[0])
+        return int(self._execute("CML", "C0")[0])
 
     def get_chordmap(self, index: int) -> tuple[Chord, ChordPhrase]:
         if index not in range(self.get_chordmap_count()):
             raise IndexError("Chordmap index out of range")
 
-        chord, phrase, success = self.execute("CML", "C1", index)
+        chord, phrase, success = self._execute("CML", "C1", index)
         return Chord.from_hex(chord), ChordPhrase.from_hex(phrase)
 
     def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
@@ -187,23 +187,23 @@ class CharaChorder(Device):
         return chordmaps, interrupted
 
     def get_chord_phrase(self, chord: Chord) -> ChordPhrase | None:
-        phrase = self.execute("CML", "C2", chord.to_hex())[0]
+        phrase = self._execute("CML", "C2", chord.to_hex())[0]
         return ChordPhrase.from_hex(phrase) if phrase != "0" else None
 
     def set_chordmap(self, chord: Chord, phrase: ChordPhrase) -> bool:
-        return self.execute("CML", "C3", chord.to_hex(), phrase.to_hex())[0] == "0"
+        return self._execute("CML", "C3", chord.to_hex(), phrase.to_hex())[0] == "0"
 
     def delete_chordmap(self, chord: Chord) -> bool:
-        return self.execute("CML", "C4", chord.to_hex())[0] == "0"
+        return self._execute("CML", "C4", chord.to_hex())[0] == "0"
 
     def delete_chordmaps(self):
-        self.execute("RST", "CLEARCML")
+        self._execute("RST", "CLEARCML")
 
     def upgrade_chordmaps(self):
-        self.execute("RST", "UPGRADECML")
+        self._execute("RST", "UPGRADECML")
 
     def commit(self) -> bool:
-        return self.execute("VAR", "B0")[0] == "0"
+        return self._execute("VAR", "B0")[0] == "0"
 
     def _maybe_commit(self, success, commit: bool) -> bool:
         if success and commit:
@@ -211,7 +211,7 @@ class CharaChorder(Device):
         return success
 
     def get_parameter(self, code: int) -> int:
-        value, success = self.execute("VAR", "B1", hex(code))
+        value, success = self._execute("VAR", "B1", hex(code))
         if success != "0":
             raise InvalidParameter(hex(code))
         return int(value)
@@ -219,7 +219,7 @@ class CharaChorder(Device):
     def set_parameter(
         self, code: int, value: int | str, *, commit: bool = False
     ) -> bool:
-        success = self.execute("VAR", "B2", hex(code), value)[0]
+        success = self._execute("VAR", "B2", hex(code), value)[0]
         if success != "0":
             # Segregate invalid parameter and invalid input errors
             self.get_parameter(code)
@@ -232,7 +232,7 @@ class CharaChorder(Device):
         if issubclass(self.__class__, CharaChorderLite) and index not in range(67):
             raise IndexError("Keymap index out of range. Must be between 0-66")
 
-        return int(self.execute("VAR", "B3", code.value, index)[0])
+        return int(self._execute("VAR", "B3", code.value, index)[0])
 
     def set_keymap(
         self, code: KeymapCode, index: int, action_id: int, *, commit: bool = False
@@ -245,7 +245,7 @@ class CharaChorder(Device):
             raise IndexError("Action id out of range. Must be between 8-2047")
 
         return self._maybe_commit(
-            self.execute("VAR", "B4", code.value, index, action_id)[0] == "0", commit
+            self._execute("VAR", "B4", code.value, index, action_id)[0] == "0", commit
         )
 
     def restart(self, *, timeout: float = 10.0):
@@ -309,28 +309,28 @@ class CharaChorder(Device):
             raise ReconnectTimeout
 
     def factory_reset(self):
-        self.execute("RST", "FACTORY")
+        self._execute("RST", "FACTORY")
 
     def enter_bootloader_mode(self):
-        self.execute("RST", "BOOTLOADER")
+        self._execute("RST", "BOOTLOADER")
 
     def reset_parameters(self):
-        self.execute("RST", "PARAMS")
+        self._execute("RST", "PARAMS")
 
     def reset_keymaps(self):
-        self.execute("RST", "KEYMAPS")
+        self._execute("RST", "KEYMAPS")
 
     def append_starter_chords(self):
-        self.execute("RST", "STARTER")
+        self._execute("RST", "STARTER")
 
     def append_functional_chords(self):
-        self.execute("RST", "FUNC")
+        self._execute("RST", "FUNC")
 
     def get_available_ram(self) -> int:
-        return int(self.execute("RAM")[0])
+        return int(self._execute("RAM")[0])
 
     def sim(self, subcommand: str, value: str) -> str:
-        return self.execute("SIM", subcommand, value)[0]
+        return self._execute("SIM", subcommand, value)[0]
 
 
 @allowed_product_ids(0x800F)  # M0
