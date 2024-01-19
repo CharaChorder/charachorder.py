@@ -109,9 +109,17 @@ class CharaChorder(Device):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def execute(self, *args: int | str) -> tuple[str, ...]:
+    def _wait_until_ready(self):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
+
+        while True:
+            self.connection.write(f"CMD\r\n".encode("utf-8"))
+            if self.connection.readline():
+                break
+
+    def execute(self, *args: int | str) -> tuple[str, ...]:
+        self._wait_until_ready()
 
         command = " ".join(map(str, args))
         self.connection.write(f"{command}\r\n".encode("utf-8"))
