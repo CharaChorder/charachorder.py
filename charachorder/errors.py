@@ -49,6 +49,10 @@ class TooManyDevices(AutoReconnectFailure):
         )
 
 
+class RestartFailure(SerialException):
+    """An exception raised when restarting a device fails"""
+
+
 class SerialConnectionNotFound(SerialException):
     def __init__(self) -> None:
         super().__init__(

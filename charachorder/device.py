@@ -10,6 +10,7 @@ from .errors import (
     InvalidParameter,
     InvalidParameterInput,
     ReconnectTimeout,
+    RestartFailure,
     SerialConnectionNotFound,
     TooManyDevices,
     UnknownCommand,
@@ -314,8 +315,13 @@ class CharaChorder(Device):
     def restart(self, *, reconnect_timeout: float = 10.0):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
-        self.connection.write(f"RST\r\n".encode("utf-8"))
-        self._reconnect(timeout=reconnect_timeout)
+        try:
+            self._execute("RST")
+        except serialutil.SerialException:
+            self._reconnect(timeout=reconnect_timeout)
+        else:
+            # This has been recorded in the CC1 M0
+            raise RestartFailure
 
     def factory_reset(self):
         self._execute("RST", "FACTORY")
