@@ -121,9 +121,12 @@ class CharaChorder(Device):
             except serialutil.SerialException:
                 # Passing timeout here in case it is set to None
                 self._reconnect(timeout=timeout)
+                continue
 
             if self.connection.readline():
                 break
+        else:
+            raise ReconnectTimeout
 
         if not silent:
             print("Pong!")
