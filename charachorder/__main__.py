@@ -4,7 +4,8 @@ from .errors import UnknownCommand
 
 def charachorder_shell(device: CharaChorder) -> None:
     print(f"{device.get_id()} ({device.connection.port})")
-    print(f"CCOS {device.get_version()}")
+    version = device.get_version()
+    print("CCOS" if version[0] == "1" else "Firmware version", version)
 
     while True:
         try:
