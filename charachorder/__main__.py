@@ -12,7 +12,7 @@ def charachorder_shell(device: CharaChorder) -> None:
             command = input("> ").split(" ")
 
             try:
-                result = device._execute(" ".join(command))
+                result = device._execute(*command)
                 print(" ".join(result))
             except UnknownCommand:
                 print("Unknown command. For a list of available commands, run `CMD`")
