@@ -174,7 +174,7 @@ class CharaChorder(Device):
 
             comports = [port for port in ports if is_same_device(port.pid, port.vid)]
 
-            # Device is restarting
+            # Device is disconnected or restarting
             if len(comports) == 0:
                 continue
 
@@ -182,7 +182,8 @@ class CharaChorder(Device):
             elif len(comports) == 1:
                 port = comports[0].device
 
-                # This is true initially when the device hasn't fully shutdown yet
+                # This is true when the device is
+                # restarting but hasn't fully shutdown yet
                 is_same_session = port == self.port
                 if is_same_session:
                     continue

@@ -28,7 +28,7 @@ class SerialException(CharaChorderException):
 
 
 class AutoReconnectFailure(SerialException):
-    """An exception raised when auto-reconnect after a restart failed"""
+    """An exception raised when auto-reconnect failed"""
 
 
 class ReconnectTimeout(AutoReconnectFailure):
@@ -36,7 +36,7 @@ class ReconnectTimeout(AutoReconnectFailure):
 
     def __init__(self) -> None:
         super().__init__(
-            "Auto reconnect after the restart has failed. You will need to re-create this object to do further Serial I/O"
+            "An attempt to auto-reconnect has failed due to a timeout. You will need to re-create this object to do further Serial I/O"
         )
 
 
@@ -45,7 +45,7 @@ class TooManyDevices(AutoReconnectFailure):
 
     def __init__(self) -> None:
         super().__init__(
-            "It looks like you have two or more devices of the same model connected simultaneously. This causes the restart to not reconnect to the correct device. You will need to re-create this object to do further Serial I/O"
+            "An attempt to auto-reconnect has failed due to two or more devices of the same model connected simultaneously which means the same device cannot be detected reliably. You will need to re-create this object to do further Serial I/O"
         )
 
 
