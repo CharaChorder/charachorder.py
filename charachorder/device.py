@@ -90,8 +90,8 @@ class CharaChorder(Device):
     def list_devices(cls) -> list[Self]:
         devices = []
         for device in super().list_devices():
-            subclass = pid_mapping.get(device.product_id, cls)
-            if issubclass(subclass, cls):
+            subclass = pid_mapping.get(device.product_id)
+            if subclass and issubclass(subclass, cls):
                 devices.append(
                     subclass(device.product_id, device.vendor_id, device.port)
                 )
