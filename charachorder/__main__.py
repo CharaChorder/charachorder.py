@@ -1,3 +1,5 @@
+import inquirer
+
 from .device import CharaChorder
 from .errors import UnknownCommand
 
@@ -33,4 +35,18 @@ if __name__ == "__main__":
         with devices[0]:
             charachorder_shell(devices[0])
     else:
-        print("Too many devices connected to spawn a shell.")
+        question = inquirer.List(
+            "device",
+            message="Please choose one of the connected devices",
+            choices=[*devices, *devices],
+            carousel=True,
+        )
+        if answers := inquirer.prompt(
+            [question],
+            theme=inquirer.themes.load_theme_from_dict(
+                {"List": {"selection_cursor": "->"}}
+            ),
+        ):
+            selected_device = answers["device"]
+            with selected_device:
+                charachorder_shell(selected_device)

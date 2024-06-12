@@ -1,0 +1,13 @@
+diff --git a/src/inquirer/render/console/_list.py b/src/inquirer/render/console/_list.py
+index 5cb48af..38ac2ba 100644
+--- a/src/inquirer/render/console/_list.py
++++ b/src/inquirer/render/console/_list.py
+@@ -61,7 +61,7 @@ def get_options(self):
+                 symbol = "+" if choice == GLOBAL_OTHER_CHOICE else self.theme.List.selection_cursor
+             else:
+                 color = self.theme.List.unselected_color
+-                symbol = " "
++                symbol = " " if choice == GLOBAL_OTHER_CHOICE else " " * len(self.theme.List.selection_cursor)
+             yield choice, symbol, color
+
+     def process_input(self, pressed):
