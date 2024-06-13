@@ -293,6 +293,108 @@ class CharaChorder(Device):
             raise InvalidParameter(hex(code))
         return int(value)
 
+    def is_serial_header_enabled(self) -> bool:
+        return bool(self.get_parameter(0x01))
+
+    def is_serial_logging_enabled(self) -> bool:
+        return bool(self.get_parameter(0x02))
+
+    def is_serial_debugging_enabled(self) -> bool:
+        return bool(self.get_parameter(0x03))
+
+    def is_serial_raw_enabled(self) -> bool:
+        return bool(self.get_parameter(0x04))
+
+    def is_serial_chord_enabled(self) -> bool:
+        return bool(self.get_parameter(0x05))
+
+    def is_serial_keyboard_enabled(self) -> bool:
+        return bool(self.get_parameter(0x06))
+
+    def is_serial_mouse_enabled(self) -> bool:
+        return bool(self.get_parameter(0x07))
+
+    def is_usb_hid_keyboard_enabled(self) -> bool:
+        return bool(self.get_parameter(0x11))
+
+    def is_charachter_entry_enabled(self) -> bool:
+        return bool(self.get_parameter(0x12))
+
+    def get_key_scan_duration(self) -> int:
+        return self.get_parameter(0x14)
+
+    def get_key_debounce_press_duration(self) -> int:
+        return self.get_parameter(0x15)
+
+    def get_key_debounce_release_duration(self) -> int:
+        return self.get_parameter(0x16)
+
+    def get_keyboard_output_character_microsecond_delays(self) -> int:
+        return self.get_parameter(0x17)
+
+    def is_usb_hid_mouse_enabled(self) -> bool:
+        return bool(self.get_parameter(0x21))
+
+    def get_slow_mouse_poll_rate(self) -> int:
+        return self.get_parameter(0x22)
+
+    def get_fast_mouse_poll_rate(self) -> int:
+        return self.get_parameter(0x23)
+
+    def is_active_mouse_enabled(self) -> bool:
+        return bool(self.get_parameter(0x24))
+
+    def get_mouse_scroll_speed(self) -> int:
+        return self.get_parameter(0x25)
+
+    def get_mouse_poll_duration(self) -> int:
+        return self.get_parameter(0x26)
+
+    def is_chording_enabled(self) -> bool:
+        return bool(self.get_parameter(0x31))
+
+    def is_chording_character_counter_timeout_enabled(self) -> bool:
+        return bool(self.get_parameter(0x32))
+
+    def get_chording_character_counter_timeout_timer(self) -> int:
+        return self.get_parameter(0x33)
+
+    def get_chord_detection_press_tolerance(self) -> int:
+        return self.get_parameter(0x34)
+
+    def get_chord_detection_release_tolerance(self) -> int:
+        return self.get_parameter(0x35)
+
+    def is_spurring_enabled(self) -> bool:
+        return bool(self.get_parameter(0x41))
+
+    def is_spurring_character_counter_timeout_enabled(self) -> bool:
+        return bool(self.get_parameter(0x42))
+
+    def get_spurring_character_counter_timeout_timer(self) -> int:
+        return self.get_parameter(0x43)
+
+    def is_arpeggiates_enabled(self) -> bool:
+        return bool(self.get_parameter(0x51))
+
+    def get_arpeggiate_tolerance(self) -> int:
+        return self.get_parameter(0x54)
+
+    def is_compound_chording_enabled(self) -> bool:
+        return bool(self.get_parameter(0x61))
+
+    def get_compound_tolerance(self) -> int:
+        return self.get_parameter(0x64)
+
+    def get_operating_system(self) -> OperatingSystem:
+        return OperatingSystem(self.get_parameter(0x91))
+
+    def is_realtime_feedback_enabled(self) -> bool:
+        return bool(self.get_parameter(0x92))
+
+    def is_startup_message_enabled(self) -> bool:
+        return bool(self.get_parameter(0x93))
+
     def set_parameter(
         self, code: int, value: int | str, *, commit: bool = False
     ) -> bool:
@@ -302,6 +404,195 @@ class CharaChorder(Device):
             self.get_parameter(code)
             raise InvalidParameterInput(hex(code), value)
         return self._maybe_commit(success, commit)
+
+    def enable_serial_header(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x01, 1), commit)
+
+    def disable_serial_header(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x01, 0), commit)
+
+    def enable_serial_logging(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x02, 1), commit)
+
+    def disable_serial_logging(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x02, 0), commit)
+
+    def enable_serial_debugging(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x03, 1), commit)
+
+    def disable_serial_debugging(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x03, 0), commit)
+
+    def enable_serial_raw(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x04, 1), commit)
+
+    def disable_serial_raw(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x04, 0), commit)
+
+    def enable_serial_chord(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x05, 1), commit)
+
+    def disable_serial_chord(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x05, 0), commit)
+
+    def enable_serial_keyboard(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x06, 1), commit)
+
+    def disable_serial_keyboard(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x06, 0), commit)
+
+    def enable_serial_mouse(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x07, 1), commit)
+
+    def disable_serial_mouse(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x07, 0), commit)
+
+    def enable_usb_hid_keyboard(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x11, 1), commit)
+
+    def disable_usb_hid_keyboard(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x11, 0), commit)
+
+    def enable_charachter_entry(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x12, 1), commit)
+
+    def disable_charachter_entry(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x12, 0), commit)
+
+    def set_key_scan_duration(self, value: int, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x14, value), commit)
+
+    def set_key_debounce_press_duration(
+        self, value: int, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x15, value), commit)
+
+    def set_key_debounce_release_duration(
+        self, value: int, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x16, value), commit)
+
+    def set_keyboard_output_character_microsecond_delays(
+        self, value: int = 480, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x17, value), commit)
+
+    def enable_usb_hid_mouse(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x21, 1), commit)
+
+    def disable_usb_hid_mouse(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x21, 0), commit)
+
+    def set_slow_mouse_poll_rate(self, value: int = 5, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x22, value), commit)
+
+    def set_fast_mouse_poll_rate(
+        self, value: int = 25, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x23, value), commit)
+
+    def enable_active_mouse(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x24, 1), commit)
+
+    def disable_active_mouse(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x24, 0), commit)
+
+    def set_mouse_scroll_speed(self, value: int = 1, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x25, value), commit)
+
+    def set_mouse_poll_duration(self, value: int = 20, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x26, value), commit)
+
+    def enable_chording(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x31, 1), commit)
+
+    def disable_chording(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x31, 0), commit)
+
+    def enable_chording_character_counter_timeout(
+        self, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x32, 1), commit)
+
+    def disable_chording_character_counter_timeout(
+        self, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x32, 0), commit)
+
+    def set_chording_character_counter_timeout_timer(
+        self, value: int = 40, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x33, value), commit)
+
+    def set_chord_detection_press_tolerance(
+        self, value: int, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x34, value), commit)
+
+    def set_chord_detection_release_tolerance(
+        self, value: int, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x35, value), commit)
+
+    def enable_spurring(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x41, 1), commit)
+
+    def disable_spurring(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x41, 0), commit)
+
+    def enable_spurring_character_counter_timeout(
+        self, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x42, 1), commit)
+
+    def disable_spurring_character_counter_timeout(
+        self, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x42, 0), commit)
+
+    def set_spurring_character_counter_timeout_timer(
+        self, value: int = 240, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x43, value), commit)
+
+    def enable_arpeggiates(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x51, 1), commit)
+
+    def disable_arpeggiates(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x51, 0), commit)
+
+    def set_arpeggiate_tolerance(
+        self, value: int = 800, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x54, value), commit)
+
+    def enable_compound_chording(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x61, 1), commit)
+
+    def disable_compound_chording(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x61, 0), commit)
+
+    def set_compound_tolerance(
+        self, value: int = 1500, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x64, value), commit)
+
+    def set_operating_system(
+        self, os: OperatingSystem, *, commit: bool = False
+    ) -> bool:
+        return self._maybe_commit(self.set_parameter(0x91, hex(os.value)), commit)
+
+    def enable_realtime_feedback(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x92, 1), commit)
+
+    def disable_realtime_feedback(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x92, 0), commit)
+
+    def enable_startup_message(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x93, 1), commit)
+
+    def disable_startup_message(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x93, 0), commit)
 
     def reset_parameters(self):
         self._execute("RST", "PARAMS")
@@ -369,6 +660,45 @@ class CharaChorderLite(CharaChorder):
     def __init__(self, product_id: int, vendor_id: int, port: str):
         super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id == 0x812F
+
+    def is_gui_ctrl_swapped(self) -> bool:
+        return bool(self.get_parameter(0x13))
+
+    def enable_gui_ctrl_swap(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x13, 1), commit)
+
+    def disable_gui_ctrl_swap(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x13, 0), commit)
+
+    def is_led_enabled(self) -> bool:
+        return bool(self.get_parameter(0x84))
+
+    def enable_led(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x84, 1), commit)
+
+    def disable_led(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x84, 0), commit)
+
+    def get_led_brightness(self) -> int:
+        return self.get_parameter(0x81)
+
+    def set_led_brightness(self, value: int = 5, *, commit: bool = False) -> bool:
+        return bool(self._maybe_commit(self.set_parameter(0x81, value), commit))
+
+    def get_led_color_code(self) -> int:
+        return self.get_parameter(0x82)
+
+    def set_led_color_code(self, value: int = 5, *, commit: bool = False) -> int:
+        return self._maybe_commit(self.set_parameter(0x82, value), commit)
+
+    def is_led_key_highlight_enabled(self) -> bool:
+        return bool(self.get_parameter(0x83))
+
+    def enable_led_key_highlight(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x83, 1), commit)
+
+    def disable_led_key_highlight(self, *, commit: bool = False) -> bool:
+        return self._maybe_commit(self.set_parameter(0x83, 0), commit)
 
 
 @allowed_product_ids(
