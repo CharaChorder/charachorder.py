@@ -270,6 +270,12 @@ class CharaChorder(Device):
     def upgrade_chordmaps(self):
         self._execute("RST", "UPGRADECML")
 
+    def append_starter_chordmaps(self):
+        self._execute("RST", "STARTER")
+
+    def append_functional_chordmaps(self):
+        self._execute("RST", "FUNC")
+
     def commit(self) -> bool:
         return self._execute("VAR", "B0")[0] == "0"
 
@@ -294,6 +300,9 @@ class CharaChorder(Device):
             raise InvalidParameterInput(hex(code), value)
         return self._maybe_commit(success, commit)
 
+    def reset_parameters(self):
+        self._execute("RST", "PARAMS")
+
     def get_keymap(self, code: KeymapCode, index: int) -> int:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
             raise IndexError("Keymap index out of range. Must be between 0-89")
@@ -316,6 +325,9 @@ class CharaChorder(Device):
             self._execute("VAR", "B4", code.value, index, action_id)[0] == "0", commit
         )
 
+    def reset_keymaps(self):
+        self._execute("RST", "KEYMAPS")
+
     def restart(self, *, reconnect_timeout: float = 10.0):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
@@ -332,18 +344,6 @@ class CharaChorder(Device):
 
     def enter_bootloader_mode(self):
         self._execute("RST", "BOOTLOADER")
-
-    def reset_parameters(self):
-        self._execute("RST", "PARAMS")
-
-    def reset_keymaps(self):
-        self._execute("RST", "KEYMAPS")
-
-    def append_starter_chords(self):
-        self._execute("RST", "STARTER")
-
-    def append_functional_chords(self):
-        self._execute("RST", "FUNC")
 
     def get_available_ram(self) -> int:
         return int(self._execute("RAM")[0])
