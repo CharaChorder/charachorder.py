@@ -82,7 +82,7 @@ class ChordPhrase(tuple):
         return cls(action_codes)
 
 
-class KeymapCode(Enum):
+class Keymap(Enum):
     primary = 0xA1
     secondary = 0xA2
     tertiary = 0xA3

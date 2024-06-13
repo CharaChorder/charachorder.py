@@ -17,7 +17,7 @@ from .errors import (
     UnknownProduct,
     UnknownVendor,
 )
-from .types import Chord, ChordPhrase, KeymapCode, OperatingSystem
+from .types import Chord, ChordPhrase, Keymap, OperatingSystem
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -597,16 +597,16 @@ class CharaChorder(Device):
     def reset_parameters(self):
         self._execute("RST", "PARAMS")
 
-    def get_keymap(self, code: KeymapCode, index: int) -> int:
+    def get_keymap(self, keymap: Keymap, index: int) -> int:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
             raise IndexError("Keymap index out of range. Must be between 0-89")
         if issubclass(self.__class__, CharaChorderLite) and index not in range(67):
             raise IndexError("Keymap index out of range. Must be between 0-66")
 
-        return int(self._execute("VAR", "B3", code.value, index)[0])
+        return int(self._execute("VAR", "B3", keymap.value, index)[0])
 
     def set_keymap(
-        self, code: KeymapCode, index: int, action_id: int, *, commit: bool = False
+        self, keymap: Keymap, index: int, action_id: int, *, commit: bool = False
     ) -> bool:
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
             raise IndexError("Keymap index out of range. Must be between 0-89")
@@ -616,7 +616,7 @@ class CharaChorder(Device):
             raise IndexError("Action id out of range. Must be between 8-2047")
 
         return self._maybe_commit(
-            self._execute("VAR", "B4", code.value, index, action_id)[0] == "0", commit
+            self._execute("VAR", "B4", keymap.value, index, action_id)[0] == "0", commit
         )
 
     def reset_keymaps(self):
