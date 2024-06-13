@@ -623,8 +623,6 @@ class CharaChorder(Device):
         self._execute("RST", "KEYMAPS")
 
     def restart(self, *, reconnect_timeout: float = 10.0):
-        if self.connection.is_open is False:
-            raise SerialConnectionNotFound
         try:
             self._execute("RST")
         except serialutil.SerialException:
