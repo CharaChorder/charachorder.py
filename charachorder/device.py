@@ -208,6 +208,9 @@ class CharaChorder(Device):
         else:
             raise ReconnectTimeout
 
+    def get_commands(self) -> list[str]:
+        return self._execute("CMD")[0].split(",")
+
     def get_id(self) -> str:
         return " ".join(self._execute("ID"))
 
