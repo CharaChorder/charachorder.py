@@ -36,7 +36,7 @@ if __name__ == "__main__":
         question = inquirer.List(
             "device",
             message="Please choose one of the connected devices",
-            choices=[*devices, *devices],
+            choices=devices,
             carousel=True,
         )
         if answers := inquirer.prompt(
