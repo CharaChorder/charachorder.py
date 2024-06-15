@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from typing import TYPE_CHECKING, Callable, Generator, Literal, NamedTuple
 
@@ -21,6 +22,8 @@ from .types import Chord, ChordPhrase, Keymap, OperatingSystem
 
 if TYPE_CHECKING:
     from typing_extensions import Self
+
+logger = logging.getLogger(__name__)
 
 pid_mapping = {}
 vid_mapping = {
@@ -114,16 +117,22 @@ class CharaChorder(Device):
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
 
+        logger.debug(f"[{self}]: Attempting to ping...")
+
         start_time = time.time()
         while True:
             try:
                 self.connection.write(f"CMD\r\n".encode("utf-8"))
             except serialutil.SerialException:
+                logger.debug(f"[{self}]: Not found. Trying to reconnect...")
                 elapsed_time = time.time() - start_time
                 self._reconnect(timeout=timeout - elapsed_time if timeout else None)
                 continue
 
             if self.connection.readline():
+                logger.debug(
+                    f"[{self}]: Ping successful in {(time.time() - start_time) * 1000:.2f}ms"
+                )
                 break
 
         if not silent:
@@ -133,6 +142,7 @@ class CharaChorder(Device):
         self.ping(silent=True)
 
         command = " ".join(map(str, args))
+        logger.debug(f"[{self}]: Executing '{command}'...")
         self.connection.write(f"{command}\r\n".encode("utf-8"))
 
         output = []
@@ -149,6 +159,7 @@ class CharaChorder(Device):
             if command == " ".join(output[: len(args)]):
                 break
 
+        logger.debug(f"[{self}]: Received '{' '.join(output)}'")
         return tuple(output[len(args) :])
 
     def _reconnect(self, *, timeout: float | None = 3.0):
