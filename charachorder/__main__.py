@@ -1,10 +1,8 @@
+import charachorder
 import inquirer
 
-from .device import CharaChorder
-from .errors import UnknownCommand
 
-
-def charachorder_shell(device: CharaChorder) -> None:
+def charachorder_shell(device: charachorder.device.CharaChorder) -> None:
     print(f"{device.get_id()} ({device.connection.port})")
     version = device.get_version()
     print("CCOS" if version[0] == "1" else "Firmware version", version)
@@ -16,7 +14,7 @@ def charachorder_shell(device: CharaChorder) -> None:
             try:
                 result = device._execute(*command)
                 print(" ".join(result))
-            except UnknownCommand:
+            except charachorder.errors.UnknownCommand:
                 print("Unknown command. For a list of available commands, run `CMD`")
         except KeyboardInterrupt:
             print()
@@ -28,7 +26,7 @@ def charachorder_shell(device: CharaChorder) -> None:
 
 
 if __name__ == "__main__":
-    devices = CharaChorder.list_devices()
+    devices = charachorder.device.CharaChorder.list_devices()
     if len(devices) == 0:
         print("No CharaChorder devices found.")
     elif len(devices) == 1:
