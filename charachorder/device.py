@@ -119,8 +119,8 @@ class CharaChorder(Device):
             try:
                 self.connection.write(f"CMD\r\n".encode("utf-8"))
             except serialutil.SerialException:
-                # Passing timeout here in case it is set to None
-                self._reconnect(timeout=timeout)
+                elapsed_time = time.time() - start_time
+                self._reconnect(timeout=timeout - elapsed_time)
                 continue
 
             if self.connection.readline():
