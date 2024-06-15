@@ -77,7 +77,7 @@ class CharaChorder(Device):
             raise UnknownProduct(product_id)
 
         if vendor_id in vid_mapping:
-            self.name, self.chipset = vid_mapping[vendor_id]
+            self.vendor, self.chipset = vid_mapping[vendor_id]
         else:
             raise UnknownVendor(vendor_id)
 
