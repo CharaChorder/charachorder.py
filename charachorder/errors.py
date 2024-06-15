@@ -71,7 +71,9 @@ class InvalidParameter(SerialException):
     """An exception raised when the given parameter code does not exist"""
 
     def __init__(self, code: str):
-        super().__init__(f'The parameter "{code}" does not exist.')
+        super().__init__(
+            f'The parameter "{code}" does not exist. Note that all of the parameter commands have dedicated methods, please use those to avoid errors.'
+        )
 
 
 class InvalidParameterInput(SerialException):
@@ -79,5 +81,5 @@ class InvalidParameterInput(SerialException):
 
     def __init__(self, code: str, value: int | str):
         super().__init__(
-            f'The parameter value "{value}" for the code "{code}" is invalid.'
+            f'The parameter value "{value}" for the code "{code}" is invalid. Note that all of the parameter commands have dedicated methods, please use those to avoid errors.'
         )
