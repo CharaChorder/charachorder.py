@@ -115,18 +115,16 @@ class CharaChorder(Device):
             raise SerialConnectionNotFound
 
         start_time = time.time()
-        while timeout and time.time() - start_time < timeout:
+        while True:
             try:
                 self.connection.write(f"CMD\r\n".encode("utf-8"))
             except serialutil.SerialException:
                 elapsed_time = time.time() - start_time
-                self._reconnect(timeout=timeout - elapsed_time)
+                self._reconnect(timeout=timeout - elapsed_time if timeout else None)
                 continue
 
             if self.connection.readline():
                 break
-        else:
-            raise ReconnectTimeout
 
         if not silent:
             print("Pong!")
@@ -158,7 +156,7 @@ class CharaChorder(Device):
             return product_id == self.product_id and vendor_id == self.vendor_id
 
         start_time = time.time()
-        while timeout and time.time() - start_time < timeout:
+        while time.time() - start_time < (timeout or float("inf")):
             try:
                 ports = list_ports.comports()
             except TypeError:
