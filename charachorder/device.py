@@ -111,51 +111,35 @@ class CharaChorder(Device):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def ping(self, *, silent: bool = False, timeout: float | None = 10.0):
+    def _execute(self, *args: int | str, **kwargs) -> tuple[str, ...]:
         if self.connection.is_open is False:
             raise SerialConnectionNotFound
 
-        logger.debug(f"[{self}]: Attempting to ping...")
-
-        start_time = time.time()
-        while True:
-            try:
-                self.connection.write(f"CMD\r\n".encode("utf-8"))
-            except serialutil.SerialException:
-                logger.debug(f"[{self}]: Not found. Trying to reconnect...")
-                elapsed_time = time.time() - start_time
-                self._reconnect(timeout=timeout - elapsed_time if timeout else None)
-                continue
-
-            if self.connection.readline():
-                logger.debug(
-                    f"[{self}]: Ping successful in {(time.time() - start_time) * 1000:.2f}ms"
-                )
-                break
-
-        if not silent:
-            print("Pong!")
-
-    def _execute(self, *args: int | str) -> tuple[str, ...]:
-        self.ping(silent=True)
-
         command = " ".join(map(str, args))
         logger.debug(f"[{self}]: Executing '{command}'...")
-        self.connection.write(f"{command}\r\n".encode("utf-8"))
 
         output = []
-        for output_bytes in self.connection.iread_until():  # Avoid logs/debug messages
-            output = output_bytes.decode("utf-8").strip().split(" ")
+        while not output:
+            try:
+                self.connection.write(f"{command}\r\n".encode("utf-8"))
+            except serialutil.SerialException:
+                logger.debug(f"[{self}]: Not found. Trying to reconnect...")
+                self._reconnect(timeout=kwargs["timeout"])
 
-            # Drop serial header
-            if output[0] == "01":
-                output = output[1:]
+            for line in self.connection.iread_until():
+                decoded_line = line.decode("utf-8").strip().split(" ")
 
-            if output[0] == "UKN":
-                raise UnknownCommand(command)
+                if decoded_line[0] == "01":  # drop serial header
+                    decoded_line = decoded_line[1:]
 
-            if command == " ".join(output[: len(args)]):
-                break
+                if decoded_line[0] == "UKN":
+                    raise UnknownCommand(command)
+
+                if command == " ".join(decoded_line[: len(args)]):
+                    output = decoded_line
+                    # There is no output in the buffer after this iteration but
+                    # the default behaviour of detecting an EOF is quite slow.
+                    break
 
         logger.debug(f"[{self}]: Received '{' '.join(output)}'")
         return tuple(output[len(args) :])
@@ -214,6 +198,14 @@ class CharaChorder(Device):
                 raise TooManyDevices
         else:
             raise ReconnectTimeout
+
+    def ping(self, *, timeout: float | None = 10.0):
+        logger.debug(f"[{self}]: Attempting to ping...")
+        start_time = time.time()
+        self._execute("CMD", timeout=timeout)
+        logger.info(
+            f"[{self}]: Ping successful in {(time.time() - start_time) * 1000:.2f}ms"
+        )
 
     def get_commands(self) -> list[str]:
         return self._execute("CMD")[0].split(",")
