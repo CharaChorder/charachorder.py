@@ -33,9 +33,9 @@ Running `nix shell github:GetPsyched/charachorder.py` will spawn a shell with Py
 Simply copy this derivation into your project and call it using `python3Packages.callPackage ./charachorder.nix { }`. If you don't know where to paste this, then this installation method is probably not for you.
 
 ```nix
-{ buildPythonPackage, fetchFromGitHub, lib, pythonOlder, pyserial }:
+{ buildPythonPackage, fetchFromGitHub, lib, pythonOlder, inquirer, pyserial }:
 
-buildPythonPackage rec {
+buildPythonPackage {
   pname = "charachorder.py";
   version = "0.4.3";
   format = "setuptools";
@@ -49,14 +49,14 @@ buildPythonPackage rec {
     hash = ""; # FIXME: Fill the hash here. Hint: Run this once and you will get the hash in the error
   };
 
-  nativeBuildInputs = [ pyserial ];
+  nativeBuildInputs = [ inquirer pyserial ];
 
-  meta = with lib; {
+  meta = {
     description = "A wrapper for CharaChorder's Serial API written in Python";
     downloadPage = "https://pypi.org/project/charachorder.py/#files";
     homepage = "https://github.com/GetPsyched/charachorder.py";
-    license = licenses.mit;
-    maintainers = [ maintainers.getpsyched ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ getpsyched ];
   };
 }
 ```
