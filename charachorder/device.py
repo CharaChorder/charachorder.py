@@ -42,12 +42,22 @@ def allowed_product_ids(*product_ids: int):
 
 
 class Device(NamedTuple):
+    """
+    Represents any device connected through a serial port.
+
+    This is more of a meta class; its main purpose is to provide a raw list of
+    devices that are connected to the system and is not significant enough to be
+    used on its own; if you want to create your own class, you should subclass
+    from `charachorder.CharaChorder` instead.
+    """
+
     product_id: int
     vendor_id: int
     port: str
 
     @classmethod
     def list_devices(cls) -> list[Device]:
+        """Returns a list of devices connected to serial ports."""
         devices = []
         for port_info in list_ports.comports():
             device = Device(
@@ -60,6 +70,17 @@ class Device(NamedTuple):
 
 
 class CharaChorder(Device):
+    """
+    Represents any CharaChorder device.
+
+    This is the base class of all the CharaChorder* classes and inherits from
+    `charachorder.Device`.
+
+    Normally, you wouldn't instantiate this class directly; instead use
+    `CharaChorder.list_devices()` to get a list of CharaChorder devices
+    connected to the system.
+    """
+
     bootloader_mode: bool
     connection: Serial
     chipset: Literal["M0", "S2"]
@@ -89,6 +110,7 @@ class CharaChorder(Device):
 
     @classmethod
     def list_devices(cls) -> list[Self]:
+        """Returns a list of CharaChorder devices connected to serial ports."""
         devices = []
         for device in super().list_devices():
             subclass = pid_mapping.get(device.product_id)
@@ -99,9 +121,11 @@ class CharaChorder(Device):
         return devices
 
     def open(self):
+        """Opens a connection to the device."""
         self.connection.open()
 
     def close(self):
+        """Closes the connection to the device."""
         self.connection.close()
 
     def __enter__(self):
@@ -200,6 +224,7 @@ class CharaChorder(Device):
             raise ReconnectTimeout
 
     def ping(self, *, timeout: float | None = 10.0):
+        """Checks if the connection to a device is alive."""
         logger.debug(f"[{self}]: Attempting to ping...")
         start_time = time.time()
         self._execute("CMD", timeout=timeout)
@@ -208,18 +233,23 @@ class CharaChorder(Device):
         )
 
     def get_commands(self) -> list[str]:
+        """Returns a list of all the commands in the Serial API."""
         return self._execute("CMD")[0].split(",")
 
     def get_id(self) -> str:
+        """Returns the company, model, and the chipset of the device."""
         return " ".join(self._execute("ID"))
 
     def get_version(self) -> str:
+        """Returns the current version of the CCOS firmware."""
         return self._execute("VERSION")[0]
 
     def get_chordmap_count(self) -> int:
+        """Returns the total number of chordmaps in the device."""
         return int(self._execute("CML", "C0")[0])
 
     def get_chordmap(self, index: int) -> tuple[Chord, ChordPhrase]:
+        """Returns a chordmap at the given index."""
         if index not in range(self.get_chordmap_count()):
             raise IndexError("Chordmap index out of range")
 
@@ -227,32 +257,41 @@ class CharaChorder(Device):
         return Chord.from_hex(chord), ChordPhrase.from_hex(phrase)
 
     def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
+        """Returns a iterable generator over all the chordmaps in the device."""
         chordmap_count = self.get_chordmap_count()
         return (self.get_chordmap(i) for i in range(chordmap_count))
 
     def get_chord_phrase(self, chord: Chord) -> ChordPhrase | None:
+        """Returns the phrase corresponding to the given chord."""
         phrase = self._execute("CML", "C2", chord.to_hex())[0]
         return ChordPhrase.from_hex(phrase) if phrase != "0" else None
 
     def set_chordmap(self, chord: Chord, phrase: ChordPhrase) -> bool:
+        """Sets a phrase corresponding to the given chord. Returns a success boolean."""
         return self._execute("CML", "C3", chord.to_hex(), phrase.to_hex())[0] == "0"
 
     def delete_chordmap(self, chord: Chord) -> bool:
+        """Deletes a chordmap from the device. Returns a success boolean."""
         return self._execute("CML", "C4", chord.to_hex())[0] == "0"
 
     def delete_chordmaps(self):
+        """Deletes all the chordmaps stored in the device and commits."""
         self._execute("RST", "CLEARCML")
 
     def upgrade_chordmaps(self):
+        """WARNING: In development. Updates any chordmaps that the system detects to be outdated and commits."""
         self._execute("RST", "UPGRADECML")
 
     def append_starter_chordmaps(self):
+        """Appends starter chordmaps to the chord library and commits."""
         self._execute("RST", "STARTER")
 
     def append_functional_chordmaps(self):
+        """Appends functional chordmaps to the chord library and commits."""
         self._execute("RST", "FUNC")
 
     def commit(self) -> bool:
+        """Commits any parameter changes to the persistent memory of the device. Returns a success boolean."""
         return self._execute("VAR", "B0")[0] == "0"
 
     def _maybe_commit(self, success, commit: bool) -> bool:
@@ -261,6 +300,7 @@ class CharaChorder(Device):
         return success
 
     def get_parameter(self, code: int) -> int:
+        """Returns the value of a parameter."""
         value, success = self._execute("VAR", "B1", hex(code))
         if success != "0":
             raise InvalidParameter(hex(code))
@@ -371,6 +411,7 @@ class CharaChorder(Device):
     def set_parameter(
         self, code: int, value: int | str, *, commit: bool = False
     ) -> bool:
+        """Sets the value of a parameter. Returns a success boolean."""
         success = self._execute("VAR", "B2", hex(code), value)[0]
         if success != "0":
             # Segregate invalid parameter and invalid input errors
@@ -568,9 +609,11 @@ class CharaChorder(Device):
         return self._maybe_commit(self.set_parameter(0x93, 0), commit)
 
     def reset_parameters(self):
+        """Resets the parameters to the factory defaults and commits."""
         self._execute("RST", "PARAMS")
 
-    def get_keymap(self, keymap: Keymap, index: int) -> int:
+    def get_keymap_action(self, keymap: Keymap, index: int) -> int:
+        """Returns the action id at a given keymap's index."""
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
             raise IndexError("Keymap index out of range. Must be between 0-89")
         if issubclass(self.__class__, CharaChorderLite) and index not in range(67):
@@ -578,9 +621,10 @@ class CharaChorder(Device):
 
         return int(self._execute("VAR", "B3", keymap.value, index)[0])
 
-    def set_keymap(
+    def set_keymap_action(
         self, keymap: Keymap, index: int, action_id: int, *, commit: bool = False
     ) -> bool:
+        """Sets an action id at the given keymap's index."""
         if issubclass(self.__class__, CharaChorderOne) and index not in range(90):
             raise IndexError("Keymap index out of range. Must be between 0-89")
         if issubclass(self.__class__, CharaChorderLite) and index not in range(67):
@@ -593,9 +637,15 @@ class CharaChorder(Device):
         )
 
     def reset_keymaps(self):
+        """Resets the keymaps to the factory defaults and commits."""
         self._execute("RST", "KEYMAPS")
 
     def restart(self, *, reconnect_timeout: float = 10.0):
+        """Restarts the device.
+
+        NOTE: This function blocks until the device is reconnected or the
+        timeout is hit.
+        """
         try:
             self._execute("RST")
         except serialutil.SerialException:
@@ -605,21 +655,33 @@ class CharaChorder(Device):
             raise RestartFailure
 
     def factory_reset(self):
+        """Performs a factory reset of the flash and emulated eeprom. During the process, the flash chip is erased."""
         self._execute("RST", "FACTORY")
 
     def enter_bootloader_mode(self):
+        """Restarts the device into a bootloader mode."""
         self._execute("RST", "BOOTLOADER")
 
     def get_available_ram(self) -> int:
+        """Returns the current number of bytes available in SRAM."""
         return int(self._execute("RAM")[0])
 
     def sim(self, subcommand: str, value: str) -> str:
+        """Inject a chord or key states to be processed by the device. Useful for debugging."""
         return self._execute("SIM", subcommand, value)[0]
 
 
 @allowed_product_ids(0x800F)  # M0
 class CharaChorderOne(CharaChorder):
-    pass
+    """
+    Represents a CharaChorderOne device.
+
+    This class inherits from `charachorder.CharaChorder`.
+
+    Normally, you wouldn't instantiate this class directly instead use
+    `CharaChorderOne.list_devices()` to get a list of CharaChorderOne devices
+    connected to the system.
+    """
 
 
 @allowed_product_ids(
@@ -628,6 +690,16 @@ class CharaChorderOne(CharaChorder):
     0x812F,  # S2 - UF2 Bootloader
 )
 class CharaChorderLite(CharaChorder):
+    """
+    Represents a CharaChorderLite device.
+
+    This class inherits from `charachorder.CharaChorder`.
+
+    Normally, you wouldn't instantiate this class directly instead use
+    `CharaChorderLite.list_devices()` to get a list of CharaChorderLite devices
+    connected to the system.
+    """
+
     def __init__(self, product_id: int, vendor_id: int, port: str):
         super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id == 0x812F
@@ -679,6 +751,16 @@ class CharaChorderLite(CharaChorder):
     0x818E,  # S2 Host - UF2 Bootloader
 )
 class CharaChorderX(CharaChorder):
+    """
+    Represents a CharaChorderX device.
+
+    This class inherits from `charachorder.CharaChorder`.
+
+    Normally, you wouldn't instantiate this class directly instead use
+    `CharaChorderX.list_devices()` to get a list of CharaChorderX devices
+    connected to the system.
+    """
+
     def __init__(self, product_id: int, vendor_id: int, port: str):
         super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id in (0x818C, 0x818E)
@@ -689,6 +771,19 @@ class CharaChorderX(CharaChorder):
     0x818A,  # S2 - UF2 Bootloader
 )
 class CharaChorderEngine(CharaChorder):
+    """
+    Represents a CharaChorderEngine device.
+
+    This class inherits from `charachorder.CharaChorder`. While this class can
+    be used directly, its intended use is to be subclassed because if you have
+    a CCEngine, you most likely are building your own device with its own
+    functions.
+
+    Normally, you wouldn't instantiate this class directly instead use
+    `CharaChorderEngine.list_devices()` to get a list of CharaChorderEngine
+    devices connected to the system.
+    """
+
     def __init__(self, product_id: int, vendor_id: int, port: str):
         super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id == 0x818A
