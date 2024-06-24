@@ -156,7 +156,7 @@ class CharaChorder(Device):
             try:
                 self.connection.write(f"{command}\r\n".encode("utf-8"))
             except serialutil.SerialException:
-                logger.debug(f"[{self}]: Not found. Trying to reconnect...")
+                logger.warning(f"[{self}]: Device not found; trying to reconnect...")
                 self._reconnect(timeout=kwargs["timeout"])
 
             for line in self.connection.iread_until():
