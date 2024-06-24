@@ -13,6 +13,7 @@ from .errors import (
     ReconnectTimeout,
     RestartFailure,
     SerialConnectionNotFound,
+    SerialException,
     TooManyDevices,
     UnknownCommand,
     UnknownProduct,
@@ -122,11 +123,19 @@ class CharaChorder(Device):
 
     def open(self):
         """Opens a connection to the device."""
-        self.connection.open()
+        try:
+            self.connection.open()
+        except serialutil.SerialException as error:
+            logger.error(error.strerror)
+            raise SerialException(error.strerror)
 
     def close(self):
         """Closes the connection to the device."""
-        self.connection.close()
+        try:
+            self.connection.open()
+        except serialutil.SerialException as error:
+            logger.error(error.strerror)
+            raise SerialException(error.strerror)
 
     def __enter__(self):
         self.open()
