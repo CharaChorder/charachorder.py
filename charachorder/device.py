@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import logging
 import time
+from logging import getLogger
 from typing import TYPE_CHECKING, Generator, Literal, NamedTuple
 
 from serial import Serial, serialutil
@@ -24,7 +24,7 @@ from .types import Chord, ChordPhrase, Keymap, OperatingSystem
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 pid_mapping = {}
 vid_mapping = {
