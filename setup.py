@@ -9,7 +9,7 @@ with open("charachorder/__init__.py") as f:
         raise RuntimeError("version is not set")
     version = match.group(1)
 
-PROJECT_URL = "https://github.com/GetPsyched/charachorder.py"
+PROJECT_URL = "https://github.com/CharaChorder/charachorder.py"
 
 setup(
     name="charachorder.py",
@@ -22,7 +22,7 @@ setup(
     author="GetPsyched",
     author_email="dev@getpsyched.dev",
     project_urls={
-        "Documentation": "https://getpsyched.github.io/charachorder.py",
+        "Documentation": "https://charachorder.github.io/charachorder.py",
         "Issue tracker": f"{PROJECT_URL}/issues",
     },
     packages=["charachorder"],

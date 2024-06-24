@@ -19,14 +19,14 @@ py -3 -m pip install -U charachorder.py
 You can build from source by cloning the repository and installing it using pip:
 
 ```sh
-git clone https://github.com/GetPsyched/charachorder.py
+git clone https://github.com/CharaChorder/charachorder.py
 cd charachorder.py
 python3 -m pip install -U .
 ```
 
 ## Using nix shell
 
-Running `nix shell github:GetPsyched/charachorder.py` will spawn a shell with Python 3.11 and this package installed. This has the caveat of not being able to change the Python version being used. To solve for this, use the package derivation itself (given below).
+Running `nix shell github:CharaChorder/charachorder.py` will spawn a shell with Python 3.11 and this package installed. This has the caveat of not being able to change the Python version being used. To solve for this, use the package derivation itself (given below).
 
 ## Using shell.nix or flake.nix
 
@@ -43,7 +43,7 @@ buildPythonPackage {
   disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
-    owner = "GetPsyched";
+    owner = "CharaChorder";
     repo = "charachorder.py";
     rev = "v${version}";
     hash = ""; # FIXME: Fill the hash here. Hint: Run this once and you will get the hash in the error
@@ -54,7 +54,7 @@ buildPythonPackage {
   meta = {
     description = "A wrapper for CharaChorder's Serial API written in Python";
     downloadPage = "https://pypi.org/project/charachorder.py/#files";
-    homepage = "https://github.com/GetPsyched/charachorder.py";
+    homepage = "https://github.com/CharaChorder/charachorder.py";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ getpsyched ];
   };

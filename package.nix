@@ -14,7 +14,7 @@ buildPythonPackage {
   meta = {
     description = "A wrapper for CharaChorder's Serial API written in Python";
     downloadPage = "https://pypi.org/project/charachorder.py/#files";
-    homepage = "https://github.com/GetPsyched/charachorder.py";
+    homepage = "https://github.com/CharaChorder/charachorder.py";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ getpsyched ];
   };

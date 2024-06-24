@@ -25,7 +25,7 @@ py -3 -m pip install -U charachorder.py
 
 To install the development version, run the following:
 ```sh
-git clone https://github.com/GetPsyched/charachorder.py
+git clone https://github.com/CharaChorder/charachorder.py
 cd charachorder.py
 python3 -m pip install -U .
 ```
@@ -48,5 +48,5 @@ for device in CharaChorder.list_devices():
 
 ## Links
 
-- [Documentation](https://getpsyched.github.io/charachorder.py)
+- [Documentation](https://charachorder.github.io/charachorder.py)
 - [CharaChorder's Official Discord Server](https://discord.gg/QZJeZGtznG)
