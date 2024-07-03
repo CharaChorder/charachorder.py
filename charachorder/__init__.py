@@ -17,4 +17,4 @@ __version__ = "0.5.0"
 
 from .device import *
 from .errors import *
-from .charachorder_types import *
+from ._types import *

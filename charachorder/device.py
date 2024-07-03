@@ -19,7 +19,7 @@ from .errors import (
     UnknownProduct,
     UnknownVendor,
 )
-from .charachorder_types import Chord, ChordPhrase, Keymap, OperatingSystem
+from ._types import Chord, ChordPhrase, Keymap, OperatingSystem
 
 if TYPE_CHECKING:
     from typing_extensions import Self
