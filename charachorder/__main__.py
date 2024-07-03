@@ -10,6 +10,8 @@ def charachorder_shell(device: charachorder.CharaChorder) -> None:
     while True:
         try:
             command = input("> ").split(" ")
+            if command[0] == "exit":
+                break
 
             try:
                 result = device._execute(*command)
@@ -20,6 +22,7 @@ def charachorder_shell(device: charachorder.CharaChorder) -> None:
             print()
             continue
         except EOFError:
+            print()
             break
         except Exception as e:
             print(f"Error: {e}")
