@@ -19,7 +19,7 @@ from .errors import (
     UnknownProduct,
     UnknownVendor,
 )
-from .types import Chord, ChordPhrase, Keymap, OperatingSystem
+from ._types import Chord, ChordPhrase, Keymap, OperatingSystem
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -262,7 +262,7 @@ class CharaChorder(Device):
         return Chord.from_hex(chord), ChordPhrase.from_hex(phrase)
 
     def get_chordmaps(self) -> Generator[tuple[Chord, ChordPhrase], None, None]:
-        """Returns a iterable generator over all the chordmaps in the device."""
+        """Returns an iterable generator over all the chordmaps in the device."""
         chordmap_count = self.get_chordmap_count()
         return (self.get_chordmap(i) for i in range(chordmap_count))
 
@@ -335,7 +335,7 @@ class CharaChorder(Device):
     def is_usb_hid_keyboard_enabled(self) -> bool:
         return bool(self.get_parameter(0x11))
 
-    def is_charachter_entry_enabled(self) -> bool:
+    def is_character_entry_enabled(self) -> bool:
         return bool(self.get_parameter(0x12))
 
     def get_key_scan_duration(self) -> int:
@@ -472,10 +472,10 @@ class CharaChorder(Device):
     def disable_usb_hid_keyboard(self, *, commit: bool = False) -> bool:
         return self._maybe_commit(self.set_parameter(0x11, 0), commit)
 
-    def enable_charachter_entry(self, *, commit: bool = False) -> bool:
+    def enable_character_entry(self, *, commit: bool = False) -> bool:
         return self._maybe_commit(self.set_parameter(0x12, 1), commit)
 
-    def disable_charachter_entry(self, *, commit: bool = False) -> bool:
+    def disable_character_entry(self, *, commit: bool = False) -> bool:
         return self._maybe_commit(self.set_parameter(0x12, 0), commit)
 
     def set_key_scan_duration(self, value: int, *, commit: bool = False) -> bool:
