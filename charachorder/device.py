@@ -131,11 +131,7 @@ class CharaChorder(Device):
 
     def close(self):
         """Closes the connection to the device."""
-        try:
-            self.connection.open()
-        except serialutil.SerialException as error:
-            logger.error(error.strerror)
-            raise SerialException(error.strerror)
+        self.connection.close()
 
     def __enter__(self):
         self.open()
