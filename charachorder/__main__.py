@@ -9,7 +9,9 @@ def charachorder_shell(device: charachorder.CharaChorder) -> None:
 
     while True:
         try:
-            command = input("> ").split(" ")
+            command = [word for word in input("> ").split(" ") if word]
+            if not command:
+                continue
             if command[0] == "exit":
                 break
 
