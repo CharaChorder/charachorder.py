@@ -5,7 +5,7 @@ import inquirer
 def charachorder_shell(device: charachorder.CharaChorder) -> None:
     print(f"{device.get_id()} ({device.connection.port})")
     version = device.get_version()
-    print("CCOS" if version[0] == "1" else "Firmware version", version)
+    print("Firmware version" if version[0] == "0" else "CCOS", version)
 
     while True:
         try:
