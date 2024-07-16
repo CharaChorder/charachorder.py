@@ -1,15 +1,24 @@
-{ buildPythonPackage, lib, pythonOlder, inquirer, pyserial }:
+{
+  buildPythonPackage,
+  lib,
+  pythonOlder,
+  inquirer,
+  pyserial,
+}:
 
 buildPythonPackage {
   pname = "charachorder.py";
-  version = "0.5.0";
+  version = "0.5.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.9";
 
   src = ./.;
 
-  nativeBuildInputs = [ inquirer pyserial ];
+  nativeBuildInputs = [
+    inquirer
+    pyserial
+  ];
 
   meta = {
     description = "A wrapper for CharaChorder's Serial API written in Python";

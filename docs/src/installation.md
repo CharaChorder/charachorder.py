@@ -37,7 +37,7 @@ Simply copy this derivation into your project and call it using `python3Packages
 
 buildPythonPackage {
   pname = "charachorder.py";
-  version = "0.5.0";
+  version = "0.5.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.9";
