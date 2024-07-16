@@ -55,30 +55,32 @@ class ChordPhrase(tuple):
             numeric_action_codes.append(int(hexadecimal[i : i + 2], 16))
 
         action_codes = []
-        for i, action_code in enumerate(numeric_action_codes):
-            if action_code in range(32):  # 10-bit scan code
-                action_codes[i + 1] = (action_code << 8) | action_codes[i + 1]
+        for i, numeric_action_code in enumerate(numeric_action_codes):
+            if numeric_action_code in range(32):  # 10-bit scan code
+                numeric_action_codes[i + 1] = (
+                    numeric_action_code << 8
+                ) | numeric_action_codes[i + 1]
 
-            elif action_code in range(32, 127):  # Alphanumeric
-                action_codes.append(chr(action_code))
+            elif numeric_action_code in range(32, 127):  # Alphanumeric
+                action_codes.append(chr(numeric_action_code))
 
-            elif action_code == 296:  # Line break
+            elif numeric_action_code == 296:  # Line break
                 action_codes.append("\n")
 
-            elif action_code == 298 and len(action_codes) > 0:  # Backspace
+            elif numeric_action_code == 298 and len(action_codes) > 0:  # Backspace
                 action_codes.pop()
 
-            elif action_code == 299:  # Tab
+            elif numeric_action_code == 299:  # Tab
                 action_codes.append("\t")
 
-            elif action_code == 544:  # Spaceright
+            elif numeric_action_code == 544:  # Spaceright
                 action_codes.append(" ")
 
-            elif action_code > 126:  # Currently unsupported
+            elif numeric_action_code > 126:  # Currently unsupported
                 action_codes.append(f"<{action_code}>")
 
             else:
-                action_codes.append(chr(action_code))
+                action_codes.append(chr(numeric_action_code))
         return cls(action_codes)
 
 
