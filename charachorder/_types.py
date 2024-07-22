@@ -77,7 +77,7 @@ class ChordPhrase(tuple):
                 action_codes.append(" ")
 
             elif numeric_action_code > 126:  # Currently unsupported
-                action_codes.append(f"<{action_code}>")
+                action_codes.append(f"<{numeric_action_code}>")
 
             else:
                 action_codes.append(chr(numeric_action_code))
