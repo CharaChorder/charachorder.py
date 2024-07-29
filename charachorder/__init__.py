@@ -13,7 +13,7 @@ __title__ = "charachorder"
 __author__ = "GetPsyched"
 __license__ = "MIT"
 __copyright__ = "Copyright 2023-present CharaChorder"
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 
 from .device import *
 from .errors import *
