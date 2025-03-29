@@ -33,10 +33,10 @@ vid_mapping = {
 }
 
 
-def allowed_product_ids(*product_ids: (int, str)):
+def allowed_product_ids(*product_ids: int):
     def decorator(cls):
-        for product in product_ids:
-            pid_mapping[product[0]] = (cls, product[1])
+        for product_id in product_ids:
+            pid_mapping[product_id] = cls
         return cls
 
     return decorator
@@ -84,7 +84,6 @@ class CharaChorder(Device):
 
     bootloader_mode: bool
     connection: Serial
-    chipset: Literal["M0", "S2", "S3"]
     vendor: Literal["Adafruit", "Espressif"]
 
     def __init__(self, product_id: int, vendor_id: int, port: str):
@@ -93,15 +92,13 @@ class CharaChorder(Device):
         # the connection is not immediately opened
         self.connection.port = port
 
+        if product_id not in pid_mapping:
+            raise UnknownProduct(product_id)
+
         if vendor_id in vid_mapping:
             self.vendor = vid_mapping[vendor_id]
         else:
             raise UnknownVendor(vendor_id)
-
-        if product_id in pid_mapping:
-            self.chipset = pid_mapping[product_id][1]
-        else:
-            raise UnknownProduct(product_id)
 
         self.name = f"{self.__class__.__name__} {self.chipset}"
 
@@ -116,8 +113,7 @@ class CharaChorder(Device):
         """Returns a list of CharaChorder devices connected to serial ports."""
         devices = []
         for device in super().list_devices():
-            mapping = pid_mapping.get(device.product_id)
-            subclass = mapping[0] if mapping else None
+            subclass = pid_mapping.get(device.product_id)
             if subclass and issubclass(subclass, cls):
                 devices.append(
                     subclass(device.product_id, device.vendor_id, device.port)
@@ -679,9 +675,7 @@ class CharaChorder(Device):
         return self._execute("SIM", subcommand, value)[0]
 
 
-@allowed_product_ids(
-    (0x800F, "M0"),
-)
+@allowed_product_ids(0x800F)  # M0
 class CharaChorderOne(CharaChorder):
     """
     Represents a CharaChorderOne device.
@@ -693,10 +687,16 @@ class CharaChorderOne(CharaChorder):
     connected to the system.
     """
 
+    chipset: Literal["M0"]
+
+    def __init__(self, product_id: int, vendor_id: int, port: str):
+        super().__init__(product_id, vendor_id, port)
+        self.chipset = "M0"
+
 
 @allowed_product_ids(
-    (0x8253, "S3"),
-    (0x8254, "S3 - UF2 Bootloader"),
+    0x8253,  # S3
+    0x8254,  # S3 - UF2 Bootloader
 )
 class CharaChorderTwo(CharaChorder):
     """
@@ -705,15 +705,22 @@ class CharaChorderTwo(CharaChorder):
     This class inherits from `charachorder.CharaChorder`.
 
     Normally, you wouldn't instantiate this class directly instead use
-    `CharaChorderOne.list_devices()` to get a list of CharaChorderOne devices
+    `CharaChorderTwo.list_devices()` to get a list of CharaChorderTwo devices
     connected to the system.
     """
 
+    chipset: Literal["S3"]
+
+    def __init__(self, product_id: int, vendor_id: int, port: str):
+        super().__init__(product_id, vendor_id, port)
+        self.bootloader_mode = self.product_id == 0x8254
+        self.chipset = "S3"
+
 
 @allowed_product_ids(
-    (0x801C, "M0"),
-    (0x812E, "S2"),
-    (0x812F, "S2 - UF2 Bootloader"),
+    0x801C,  # M0
+    0x812E,  # S2
+    0x812F,  # S2 - UF2 Bootloader
 )
 class CharaChorderLite(CharaChorder):
     """
@@ -726,9 +733,12 @@ class CharaChorderLite(CharaChorder):
     connected to the system.
     """
 
+    chipset: Literal["M0", "S2"]
+
     def __init__(self, product_id: int, vendor_id: int, port: str):
         super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id == 0x812F
+        self.chipset = "M0" if self.product_id == 0x801C else "S2"
 
     def is_gui_ctrl_swapped(self) -> bool:
         return bool(self.get_parameter(0x13))
@@ -771,10 +781,10 @@ class CharaChorderLite(CharaChorder):
 
 
 @allowed_product_ids(
-    (0x818B, "S2"),
-    (0x818C, "S2 - UF2 Bootloader"),
-    (0x818D, "S2 Host"),
-    (0x818E, "S2 Host - UF2 Bootloader"),
+    0x818B,  # S2
+    0x818C,  # S2 - UF2 Bootloader
+    0x818D,  # S2 Host
+    0x818E,  # S2 Host - UF2 Bootloader
 )
 class CharaChorderX(CharaChorder):
     """
@@ -787,14 +797,17 @@ class CharaChorderX(CharaChorder):
     connected to the system.
     """
 
+    chipset: Literal["S2"]
+
     def __init__(self, product_id: int, vendor_id: int, port: str):
         super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id in (0x818C, 0x818E)
+        self.chipset = "S2"
 
 
 @allowed_product_ids(
-    (0x8189, "S2"),
-    (0x818A, "S2 - UF2 Bootloader"),
+    0x8189,  # S2
+    0x818A,  # S2 - UF2 Bootloader
 )
 class CharaChorderEngine(CharaChorder):
     """
@@ -810,6 +823,9 @@ class CharaChorderEngine(CharaChorder):
     devices connected to the system.
     """
 
+    chipset: Literal["S2"]
+
     def __init__(self, product_id: int, vendor_id: int, port: str):
         super().__init__(product_id, vendor_id, port)
         self.bootloader_mode = self.product_id == 0x818A
+        self.chipset = "S2"
